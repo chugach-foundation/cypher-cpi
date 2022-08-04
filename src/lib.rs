@@ -3,7 +3,21 @@ mod client;
 use anchor_lang::prelude::*;
 use jet_proto_math::Number;
 
-anchor_gen::generate_cpi_interface!(idl_path = "idl.json", zero_copy(PriceHistory));
+anchor_gen::generate_cpi_interface!(
+    idl_path = "idl.json",
+    zero_copy(
+        PriceHistory,
+        CypherGroup,
+        CypherGroupConfig,
+        CypherMarket,
+        CypherMarketConfig,
+        CypherToken,
+        CypherUser,
+        UserPosition,
+        OpenOrdersInfo,
+        PriceHistory
+    )
+);
 
 #[cfg(feature = "mainnet-beta")]
 declare_id!("CYPHER79cJLzQ8iyyr6oeizfGgR9YU9NM9oTMPWak5oQ");

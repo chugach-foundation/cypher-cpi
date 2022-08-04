@@ -2,15 +2,15 @@
 use {
     crate::accounts::{
         DepositCollateral as DepositCollateralAccounts, InitCypherUser as InitCypherUserAccounts,
-        NoOpCancelOrders as CancelOrdersAccounts, NoOpNewOrderV3 as NewOrderV3Accounts,
-        SettlePosition as SettlePositionAccounts, WithdrawCollateral as WithdrawCollateralAccounts,
         LiquidateCollateral as LiquidateCollateralAccounts,
+        SettlePosition as SettlePositionAccounts, WithdrawCollateral as WithdrawCollateralAccounts,
     },
     crate::instruction::{
         DepositCollateral as DepositCollateralInstruction,
-        InitCypherUser as InitCypherUserInstruction, NoOpCancelOrders as CancelOrdersInstruction,
-        NoOpNewOrderV3 as NewOrderV3Instruction, SettlePosition as SettlePositionInstruction,
-        WithdrawCollateral as WithdrawCollateralInstruction, LiquidateCollateral as LiquidateCollateralInstruction
+        InitCypherUser as InitCypherUserInstruction,
+        LiquidateCollateral as LiquidateCollateralInstruction,
+        SettlePosition as SettlePositionInstruction,
+        WithdrawCollateral as WithdrawCollateralInstruction,
     },
     anchor_lang::{prelude::Pubkey, system_program, AnchorSerialize, ToAccountMetas},
     anchor_spl::token,
@@ -102,17 +102,17 @@ pub fn liquidate_collateral(
         cypher_group: *cypher_group,
         cypher_user: *cypher_user,
         user_signer: *owner,
-        liqee_cypher_user: *liqee_cypher_user
+        liqee_cypher_user: *liqee_cypher_user,
     };
     let ix_data = LiquidateCollateralInstruction {
         _asset_mint: *asset_mint,
-        _liab_mint: *liability_mint
+        _liab_mint: *liability_mint,
     };
 
     Instruction {
         accounts: accounts.to_account_metas(Some(false)),
         data: ix_data.try_to_vec().unwrap(),
-        program_id: crate::id(),        
+        program_id: crate::id(),
     }
 }
 
