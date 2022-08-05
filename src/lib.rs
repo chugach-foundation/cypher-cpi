@@ -1,4 +1,4 @@
-mod client;
+pub mod client;
 
 use anchor_lang::prelude::*;
 use jet_proto_math::Number;
@@ -23,6 +23,15 @@ anchor_gen::generate_cpi_interface!(
 declare_id!("CYPHER79cJLzQ8iyyr6oeizfGgR9YU9NM9oTMPWak5oQ");
 #[cfg(not(feature = "mainnet-beta"))]
 declare_id!("8Z8nDAa98hgdYCS9SyAyAesxE3ZhAq8Qo1E8v2V8VU56");
+
+pub mod devnet_faucet {
+    use anchor_lang::declare_id;
+
+    #[cfg(feature = "devnet")]
+    declare_id!("7njrvFJx4NJQvzywv1LdnPwzYYTSh1wWgGL5vkwTUuSS");
+    #[cfg(not(feature = "devnet"))]
+    declare_id!("7njrvFJx4NJQvzywv1LdnPwzYYTSh1wWgGL5vkwTUuSS");
+}
 
 pub mod quote_mint {
     use anchor_lang::declare_id;
@@ -149,5 +158,14 @@ impl CypherMarket {
     /// gets the latest cached oracle price
     pub fn oracle_price(&self) -> u64 {
         self.oracle_price.price
+    }
+}
+
+impl CypherUser {
+    pub fn get_user_position(&self, market_index: usize) -> Option<&UserPosition> {
+        if self.positions[market_index].market_idx == u8::default() {
+            return None;
+        }
+        self.positions.get(market_index)
     }
 }

@@ -2,7 +2,8 @@
 use {
     crate::accounts::{
         DepositCollateral, InitCypherUser, LiquidateCollateral, NoOpCancelOrder as CancelOrder,
-        NoOpCancelOrderDex as CancelOrderDex, NoOpNewOrderV3 as NewOrderV3,
+        NoOpCancelOrderDex as CancelOrderDex, NoOpCloseOpenOrders as CloseOpenOrders,
+        NoOpInitOpenOrders as InitOpenOrders, NoOpNewOrderV3 as NewOrderV3,
         NoOpNewOrderV3Dex as NewOrderV3Dex, NoOpSettleFunds as SettleFunds,
         NoOpSettleFundsDex as SettleFundsDex, SettlePosition, WithdrawCollateral,
     },
@@ -138,6 +139,56 @@ pub fn settle_position_ix(
     Instruction {
         accounts: accounts.to_account_metas(Some(false)),
         data: ix_data.try_to_vec().unwrap(),
+        program_id: crate::id(),
+    }
+}
+
+pub fn init_open_orders_ix(
+    cypher_group: &Pubkey,
+    cypher_user: &Pubkey,
+    user_signer: &Pubkey,
+    dex_market: &Pubkey,
+    open_orders: &Pubkey,
+    market_authority: &Pubkey,
+) -> Instruction {
+    let accounts = InitOpenOrders {
+        cypher_group: *cypher_group,
+        cypher_user: *cypher_user,
+        user_signer: *user_signer,
+        dex_market: *dex_market,
+        init_oo_authority: *market_authority,
+        open_orders: *open_orders,
+        rent: Rent::id(),
+        system_program: system_program::ID,
+        dex_program: dex::id(),
+    };
+
+    Instruction {
+        accounts: accounts.to_account_metas(Some(false)),
+        data: MarketInstruction::InitOpenOrders.pack(),
+        program_id: crate::id(),
+    }
+}
+
+pub fn close_open_orders_ix(
+    cypher_group: &Pubkey,
+    cypher_user: &Pubkey,
+    user_signer: &Pubkey,
+    dex_market: &Pubkey,
+    open_orders: &Pubkey,
+) -> Instruction {
+    let accounts = CloseOpenOrders {
+        cypher_group: *cypher_group,
+        cypher_user: *cypher_user,
+        user_signer: *user_signer,
+        dex_market: *dex_market,
+        open_orders: *open_orders,
+        dex_program: dex::id(),
+    };
+
+    Instruction {
+        accounts: accounts.to_account_metas(Some(false)),
+        data: MarketInstruction::CloseOpenOrders.pack(),
         program_id: crate::id(),
     }
 }

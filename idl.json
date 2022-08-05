@@ -254,6 +254,93 @@
       ]
     },
     {
+      "name": "noOpInitOpenOrders",
+      "accounts": [
+        {
+          "name": "cypherGroup",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "cypherUser",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userSigner",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "dexMarket",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "initOoAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "openOrders",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "dexProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "noOpCloseOpenOrders",
+      "accounts": [
+        {
+          "name": "cypherGroup",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "cypherUser",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userSigner",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "dexMarket",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "openOrders",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "dexProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "noOpNewOrderV3",
       "accounts": [
         {
