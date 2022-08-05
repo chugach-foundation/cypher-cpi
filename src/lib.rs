@@ -143,12 +143,12 @@ impl CypherToken {
         Number::from_bytes(self.base_borrows)
     }
 
-    /// gets the total deposits according to the token's deposit index
+    /// gets the total deposits adjusted for the token's deposit index
     pub fn total_deposits(&self) -> Number {
         self.base_deposits() * self.deposit_index()
     }
 
-    /// gets the total borrows according to the token's borrow index
+    /// gets the total borrows adjusted for the token's borrow index
     pub fn total_borrows(&self) -> Number {
         self.base_borrows() * self.borrow_index()
     }
@@ -162,10 +162,33 @@ impl CypherMarket {
 }
 
 impl CypherUser {
+    /// gets the user's position for the given market index
     pub fn get_user_position(&self, market_index: usize) -> Option<&UserPosition> {
         if self.positions[market_index].market_idx == u8::default() {
             return None;
         }
         self.positions.get(market_index)
+    }
+}
+
+impl UserPosition {    
+    /// gets the base deposit amount
+    pub fn base_deposits(&self) -> Number {
+        Number::from_bytes(self.base_deposits)
+    }
+
+    /// gets the base borrows amount
+    pub fn base_borrows(&self) -> Number {
+        Number::from_bytes(self.base_borrows)
+    }
+
+    /// gets the user's total deposits adjusted for the token's deposit index
+    pub fn total_deposits(&self, cypher_token: &CypherToken) -> Number {
+        self.base_deposits() * cypher_token.deposit_index()
+    }
+    
+    /// gets the user's total borrows adjusted for the token's borrow index
+    pub fn total_borrows(&self, cypher_token: &CypherToken) -> Number {
+        self.base_borrows() * cypher_token.borrow_index()
     }
 }
