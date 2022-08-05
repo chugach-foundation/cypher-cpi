@@ -9,7 +9,7 @@ use {
     },
     anchor_lang::{prelude::*, system_program},
     anchor_spl::{dex, token, token::spl_token},
-    bytemuck::bytes_of,
+    bytemuck::{bytes_of, from_bytes, Pod},
     serum_dex::instruction::{CancelOrderInstructionV2, MarketInstruction, NewOrderInstructionV3},
     solana_sdk::{instruction::Instruction, sysvar::SysvarId},
 };
@@ -19,6 +19,13 @@ pub const B_CYPHER_GROUP: &[u8] = b"cypher_group";
 pub const B_CYPHER_USER: &[u8] = b"cypher_user";
 pub const B_DEX_MARKET_AUTHORITY: &[u8] = b"dex_market_authority";
 pub const B_OPEN_ORDERS: &[u8] = b"open_orders";
+
+pub fn parse_dex_account<T: Pod>(data: Vec<u8>) -> T {
+    let data_len = data.len() - 12;
+    let (_, rest) = data.split_at(5);
+    let (mid, _) = rest.split_at(data_len);
+    *from_bytes(mid)
+}
 
 pub fn gen_dex_vault_signer_key(nonce: u64, dex_market_pk: &Pubkey) -> Pubkey {
     let seeds = [dex_market_pk.as_ref(), bytes_of(&nonce)];

@@ -171,7 +171,7 @@ impl CypherUser {
     }
 }
 
-impl UserPosition {    
+impl UserPosition {
     /// gets the base deposit amount
     pub fn base_deposits(&self) -> Number {
         Number::from_bytes(self.base_deposits)
@@ -186,7 +186,7 @@ impl UserPosition {
     pub fn total_deposits(&self, cypher_token: &CypherToken) -> Number {
         self.base_deposits() * cypher_token.deposit_index()
     }
-    
+
     /// gets the user's total borrows adjusted for the token's borrow index
     pub fn total_borrows(&self, cypher_token: &CypherToken) -> Number {
         self.base_borrows() * cypher_token.borrow_index()
