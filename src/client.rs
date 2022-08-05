@@ -1,19 +1,10 @@
 #![allow(dead_code)]
 use {
     crate::accounts::{
-        DepositCollateral as DepositCollateralAccounts, InitCypherUser as InitCypherUserAccounts,
-        LiquidateCollateral as LiquidateCollateralAccounts, NoOpCancelOrder as CancelOrderAccounts,
-        NoOpCancelOrderDex as CancelOrderDexAccounts, NoOpNewOrderV3 as NewOrderV3Accounts,
-        NoOpNewOrderV3Dex as NewOrderV3DexAccounts, NoOpSettleFunds as SettleFundsAccounts,
-        NoOpSettleFundsDex as SettleFundsDexAccounts, SettlePosition as SettlePositionAccounts,
-        WithdrawCollateral as WithdrawCollateralAccounts,
-    },
-    crate::instruction::{
-        DepositCollateral as DepositCollateralInstruction,
-        InitCypherUser as InitCypherUserInstruction,
-        LiquidateCollateral as LiquidateCollateralInstruction,
-        SettlePosition as SettlePositionInstruction,
-        WithdrawCollateral as WithdrawCollateralInstruction,
+        DepositCollateral, InitCypherUser, LiquidateCollateral, NoOpCancelOrder as CancelOrder,
+        NoOpCancelOrderDex as CancelOrderDex, NoOpNewOrderV3 as NewOrderV3,
+        NoOpNewOrderV3Dex as NewOrderV3Dex, NoOpSettleFunds as SettleFunds,
+        NoOpSettleFundsDex as SettleFundsDex, SettlePosition, WithdrawCollateral,
     },
     anchor_lang::{prelude::*, system_program},
     anchor_spl::{dex, token, token::spl_token},
@@ -27,11 +18,12 @@ pub fn gen_dex_vault_signer_key(nonce: u64, dex_market_pk: &Pubkey) -> Pubkey {
     Pubkey::create_program_address(&seeds, &dex::id()).unwrap()
 }
 
-pub fn derive_dex_market_authority(dex_market_pk: &Pubkey) -> (Pubkey, u8) {
+pub fn derive_dex_market_authority(dex_market_pk: &Pubkey) -> Pubkey {
     Pubkey::find_program_address(
         &[b"dex_market_authority", dex_market_pk.as_ref()],
         &crate::id(),
     )
+    .0
 }
 
 pub fn init_cypher_user_ix(
@@ -40,14 +32,13 @@ pub fn init_cypher_user_ix(
     owner: &Pubkey,
     bump: u8,
 ) -> Instruction {
-    let accounts = InitCypherUserAccounts {
+    let accounts = InitCypherUser {
         cypher_group: *cypher_group,
         cypher_user: *cypher_user,
         owner: *owner,
         system_program: system_program::ID,
     };
-    let ix_data = InitCypherUserInstruction { _bump: bump };
-
+    let ix_data = crate::instruction::InitCypherUser { _bump: bump };
     Instruction {
         accounts: accounts.to_account_metas(Some(false)),
         data: ix_data.try_to_vec().unwrap(),
@@ -63,7 +54,7 @@ pub fn deposit_collateral_ix(
     source_token_account: &Pubkey,
     amount: u64,
 ) -> Instruction {
-    let accounts = DepositCollateralAccounts {
+    let accounts = DepositCollateral {
         cypher_group: *cypher_group,
         cypher_user: *cypher_user,
         user_signer: *owner,
@@ -71,8 +62,7 @@ pub fn deposit_collateral_ix(
         deposit_from: *source_token_account,
         token_program: token::ID,
     };
-    let ix_data = DepositCollateralInstruction { _amount: amount };
-
+    let ix_data = crate::instruction::DepositCollateral { _amount: amount };
     Instruction {
         accounts: accounts.to_account_metas(Some(false)),
         data: ix_data.try_to_vec().unwrap(),
@@ -89,7 +79,7 @@ pub fn withdraw_collateral_ix(
     destination_token_account: &Pubkey,
     amount: u64,
 ) -> Instruction {
-    let accounts = WithdrawCollateralAccounts {
+    let accounts = WithdrawCollateral {
         cypher_group: *cypher_group,
         cypher_user: *cypher_user,
         user_signer: *owner,
@@ -98,7 +88,7 @@ pub fn withdraw_collateral_ix(
         withdraw_to: *destination_token_account,
         token_program: token::ID,
     };
-    let ix_data = WithdrawCollateralInstruction { _amount: amount };
+    let ix_data = crate::instruction::WithdrawCollateral { _amount: amount };
 
     Instruction {
         accounts: accounts.to_account_metas(Some(false)),
@@ -115,13 +105,13 @@ pub fn liquidate_collateral_ix(
     asset_mint: &Pubkey,
     liability_mint: &Pubkey,
 ) -> Instruction {
-    let accounts = LiquidateCollateralAccounts {
+    let accounts = LiquidateCollateral {
         cypher_group: *cypher_group,
         cypher_user: *cypher_user,
         user_signer: *owner,
         liqee_cypher_user: *liqee_cypher_user,
     };
-    let ix_data = LiquidateCollateralInstruction {
+    let ix_data = crate::instruction::LiquidateCollateral {
         _asset_mint: *asset_mint,
         _liab_mint: *liability_mint,
     };
@@ -138,12 +128,12 @@ pub fn settle_position_ix(
     cypher_user: &Pubkey,
     c_asset_mint: &Pubkey,
 ) -> Instruction {
-    let accounts = SettlePositionAccounts {
+    let accounts = SettlePosition {
         cypher_group: *cypher_group,
         cypher_user: *cypher_user,
         c_asset_mint: *c_asset_mint,
     };
-    let ix_data = SettlePositionInstruction {};
+    let ix_data = crate::instruction::SettlePosition {};
 
     Instruction {
         accounts: accounts.to_account_metas(Some(false)),
@@ -155,7 +145,6 @@ pub fn settle_position_ix(
 #[allow(clippy::too_many_arguments)]
 pub fn new_order_v3_ix(
     cypher_group: &Pubkey,
-    cypher_market: &Pubkey,
     vault_signer: &Pubkey,
     price_history: &Pubkey,
     cypher_user: &Pubkey,
@@ -174,7 +163,7 @@ pub fn new_order_v3_ix(
     dex_vault_signer: &Pubkey,
     data: NewOrderInstructionV3,
 ) -> Instruction {
-    let accounts = NewOrderV3Accounts {
+    let accounts = NewOrderV3 {
         cypher_group: *cypher_group,
         vault_signer: *vault_signer,
         price_history: *price_history,
@@ -183,7 +172,7 @@ pub fn new_order_v3_ix(
         c_asset_mint: *c_asset_mint,
         cypher_c_asset_vault: *cypher_c_asset_vault,
         cypher_pc_vault: *cypher_pc_vault,
-        NoOpNewOrderV3dex: NewOrderV3DexAccounts {
+        NoOpNewOrderV3dex: NewOrderV3Dex {
             market: *dex_market,
             open_orders: *open_orders,
             req_q: *request_queue,
@@ -209,9 +198,7 @@ pub fn new_order_v3_ix(
 #[allow(clippy::too_many_arguments)]
 pub fn cancel_order_ix(
     cypher_group: &Pubkey,
-    cypher_market: &Pubkey,
     vault_signer: &Pubkey,
-    price_history: &Pubkey,
     cypher_user: &Pubkey,
     user_signer: &Pubkey,
     c_asset_mint: &Pubkey,
@@ -228,7 +215,7 @@ pub fn cancel_order_ix(
     dex_vault_signer: &Pubkey,
     data: CancelOrderInstructionV2,
 ) -> Instruction {
-    let accounts = CancelOrderAccounts {
+    let accounts = CancelOrder {
         cypher_group: *cypher_group,
         vault_signer: *vault_signer,
         cypher_user: *cypher_user,
@@ -236,7 +223,7 @@ pub fn cancel_order_ix(
         c_asset_mint: *c_asset_mint,
         cypher_c_asset_vault: *cypher_c_asset_vault,
         cypher_pc_vault: *cypher_pc_vault,
-        NoOpCancelOrderdex: CancelOrderDexAccounts {
+        NoOpCancelOrderdex: CancelOrderDex {
             market: *dex_market,
             prune_authority: *prune_authority,
             open_orders: *open_orders,
@@ -261,9 +248,7 @@ pub fn cancel_order_ix(
 #[allow(clippy::too_many_arguments)]
 pub fn cancel_order_by_client_id_ix(
     cypher_group: &Pubkey,
-    cypher_market: &Pubkey,
     vault_signer: &Pubkey,
-    price_history: &Pubkey,
     cypher_user: &Pubkey,
     user_signer: &Pubkey,
     c_asset_mint: &Pubkey,
@@ -280,7 +265,7 @@ pub fn cancel_order_by_client_id_ix(
     dex_vault_signer: &Pubkey,
     client_id: u64,
 ) -> Instruction {
-    let accounts = CancelOrderAccounts {
+    let accounts = CancelOrder {
         cypher_group: *cypher_group,
         vault_signer: *vault_signer,
         cypher_user: *cypher_user,
@@ -288,7 +273,7 @@ pub fn cancel_order_by_client_id_ix(
         c_asset_mint: *c_asset_mint,
         cypher_c_asset_vault: *cypher_c_asset_vault,
         cypher_pc_vault: *cypher_pc_vault,
-        NoOpCancelOrderdex: CancelOrderDexAccounts {
+        NoOpCancelOrderdex: CancelOrderDex {
             market: *dex_market,
             prune_authority: *prune_authority,
             open_orders: *open_orders,
@@ -313,9 +298,7 @@ pub fn cancel_order_by_client_id_ix(
 #[allow(clippy::too_many_arguments)]
 pub fn settle_funds_ix(
     cypher_group: &Pubkey,
-    cypher_market: &Pubkey,
     vault_signer: &Pubkey,
-    price_history: &Pubkey,
     cypher_user: &Pubkey,
     user_signer: &Pubkey,
     c_asset_mint: &Pubkey,
@@ -327,7 +310,7 @@ pub fn settle_funds_ix(
     pc_vault: &Pubkey,
     dex_vault_signer: &Pubkey,
 ) -> Instruction {
-    let accounts = SettleFundsAccounts {
+    let accounts = SettleFunds {
         cypher_group: *cypher_group,
         vault_signer: *vault_signer,
         cypher_user: *cypher_user,
@@ -335,7 +318,7 @@ pub fn settle_funds_ix(
         c_asset_mint: *c_asset_mint,
         cypher_c_asset_vault: *cypher_c_asset_vault,
         cypher_pc_vault: *cypher_pc_vault,
-        NoOpSettleFundsdex: SettleFundsDexAccounts {
+        NoOpSettleFundsdex: SettleFundsDex {
             market: *dex_market,
             open_orders: *open_orders,
             coin_vault: *coin_vault,
