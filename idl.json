@@ -362,19 +362,10 @@
           ]
         }
       ],
-      "args": [
-        {
-          "name": "price",
-          "type": "u64"
-        },
-        {
-          "name": "amount",
-          "type": "u64"
-        }
-      ]
+      "args": []
     },
     {
-      "name": "noOpCancelOrders",
+      "name": "noOpCancelOrder",
       "accounts": [
         {
           "name": "cypherGroup",
@@ -472,16 +463,88 @@
           ]
         }
       ],
-      "args": [
+      "args": []
+    },
+    {
+      "name": "noOpSettleFunds",
+      "accounts": [
         {
-          "name": "price",
-          "type": "u64"
+          "name": "cypherGroup",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          "name": "amount",
-          "type": "u64"
+          "name": "vaultSigner",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "cypherUser",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userSigner",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "cAssetMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "cypherCAssetVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "cypherPcVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "dex",
+          "accounts": [
+            {
+              "name": "market",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "openOrders",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "coinVault",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "pcVault",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "vaultSigner",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "tokenProgram",
+              "isMut": false,
+              "isSigner": false
+            },
+            {
+              "name": "dexProgram",
+              "isMut": false,
+              "isSigner": false
+            }
+          ]
         }
-      ]
+      ],
+      "args": []
     },
     {
       "name": "updateMarketExpirationTime",
