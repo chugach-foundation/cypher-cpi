@@ -19,10 +19,10 @@ mainnet-beta = []
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-anchor-gen = "0.3.0"
-anchor-lang = ">=0.20"
-anchor-spl = { version= ">=0.20", features = ["token", "associated_token", "dex"] }
 solana-sdk = "~1.10.25"
-serum_dex = { git = "https://github.com/chugach-foundation/serum-dex.git", rev="2fab8b9", features = ["fuzz", "no-entrypoint" ] }
-jet-proto-math = { git = "https://github.com/chugach-foundation/jet-program-libraries.git", rev="ac8909b" }
+anchor-gen = "0.3.0"
 bytemuck = { version = "1.4.0" }
+anchor-lang = { git = "https://github.com/chugach-foundation/anchor.git", rev="9131d9f" }
+anchor-spl = { git = "https://github.com/chugach-foundation/anchor.git", rev="9131d9f", features = ["token", "associated_token", "dex"] }
+serum_dex = { git = "https://github.com/chugach-foundation/serum-dex.git", rev = "2fab8b9", features = ["fuzz", "no-entrypoint" ] }
+jet-proto-math = { git = "https://github.com/chugach-foundation/jet-program-libraries.git", rev = "ac8909b" }
