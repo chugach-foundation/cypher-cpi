@@ -84,7 +84,7 @@ pub fn init_cypher_user_ix(
     let ix_data = crate::instruction::InitCypherUser { _bump: bump };
     Instruction {
         accounts: accounts.to_account_metas(Some(false)),
-        data: ix_data.try_to_vec().unwrap(),
+        data: AnchorSerialize::try_to_vec(&ix_data).unwrap(),
         program_id: crate::id(),
     }
 }
@@ -108,7 +108,7 @@ pub fn deposit_collateral_ix(
     let ix_data = crate::instruction::DepositCollateral { _amount: amount };
     Instruction {
         accounts: accounts.to_account_metas(Some(false)),
-        data: ix_data.try_to_vec().unwrap(),
+        data: AnchorSerialize::try_to_vec(&ix_data).unwrap(),
         program_id: crate::id(),
     }
 }
@@ -135,7 +135,7 @@ pub fn withdraw_collateral_ix(
 
     Instruction {
         accounts: accounts.to_account_metas(Some(false)),
-        data: ix_data.try_to_vec().unwrap(),
+        data: AnchorSerialize::try_to_vec(&ix_data).unwrap(),
         program_id: crate::id(),
     }
 }
@@ -161,7 +161,7 @@ pub fn liquidate_collateral_ix(
 
     Instruction {
         accounts: accounts.to_account_metas(Some(false)),
-        data: ix_data.try_to_vec().unwrap(),
+        data: AnchorSerialize::try_to_vec(&ix_data).unwrap(),
         program_id: crate::id(),
     }
 }
@@ -180,7 +180,7 @@ pub fn settle_position_ix(
 
     Instruction {
         accounts: accounts.to_account_metas(Some(false)),
-        data: ix_data.try_to_vec().unwrap(),
+        data: AnchorSerialize::try_to_vec(&ix_data).unwrap(),
         program_id: crate::id(),
     }
 }
