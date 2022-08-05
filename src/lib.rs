@@ -1,8 +1,10 @@
 pub mod client;
+pub mod constants;
 
-use std::mem::take;
 use anchor_lang::prelude::*;
+use constants::*;
 use jet_proto_math::Number;
+use std::mem::take;
 
 anchor_gen::generate_cpi_interface!(
     idl_path = "idl.json",
@@ -41,11 +43,6 @@ pub mod quote_mint {
     #[cfg(not(feature = "mainnet-beta"))]
     declare_id!("DPhNUKVhnrkdbq37GUgTUBRbZLsvziX1p5e5YUXyjBsb");
 }
-
-// group
-pub const MARKETS_MAX_CNT: usize = 15;
-pub const TOKENS_MAX_CNT: usize = MARKETS_MAX_CNT + 1;
-pub const QUOTE_TOKEN_IDX: usize = TOKENS_MAX_CNT - 1;
 
 impl CypherGroup {
     /// gets the group's margin initialization ratio
@@ -162,7 +159,7 @@ impl CypherMarket {
     }
 }
 
-impl CypherUser {    
+impl CypherUser {
     pub fn iter_positions<'a>(&'a self) -> impl Iterator<Item = &UserPosition> {
         struct Iter<'a> {
             positions: &'a [UserPosition],
@@ -261,7 +258,7 @@ impl CypherUser {
         }
         liabs_value
     }
-    
+
     /// gets the user's margin c-ratio
     pub fn get_margin_c_ratio(&self, group: &CypherGroup) -> Number {
         let liabs_value = self.get_liabilities_value(group);
@@ -275,10 +272,7 @@ impl CypherUser {
 
     /// gets the user's margin c-ratio components
     /// the first number is the margin c-ratio, the second number is the assets value and the third  number is the liabilites value
-    pub fn get_margin_c_ratio_components(
-        &self,
-        group: &CypherGroup,
-    ) -> (Number, Number, Number) {
+    pub fn get_margin_c_ratio_components(&self, group: &CypherGroup) -> (Number, Number, Number) {
         let liabs_value = self.get_liabilities_value(group);
         if liabs_value == Number::ZERO {
             (Number::MAX, self.get_assets_value(group), liabs_value)

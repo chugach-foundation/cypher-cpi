@@ -7,6 +7,7 @@ use {
         NoOpNewOrderV3Dex as NewOrderV3Dex, NoOpSettleFunds as SettleFunds,
         NoOpSettleFundsDex as SettleFundsDex, SettlePosition, WithdrawCollateral,
     },
+    crate::constants::*,
     anchor_lang::{prelude::*, system_program},
     anchor_spl::{dex, token, token::spl_token},
     bytemuck::{bytes_of, from_bytes, Pod},
@@ -14,11 +15,15 @@ use {
     solana_sdk::{instruction::Instruction, sysvar::SysvarId},
 };
 
-// binary strings
-pub const B_CYPHER_GROUP: &[u8] = b"cypher_group";
-pub const B_CYPHER_USER: &[u8] = b"cypher_user";
-pub const B_DEX_MARKET_AUTHORITY: &[u8] = b"dex_market_authority";
-pub const B_OPEN_ORDERS: &[u8] = b"open_orders";
+pub trait ToPubkey {
+    fn to_pubkey(&self) -> Pubkey;
+}
+
+impl ToPubkey for [u64; 4] {
+    fn to_pubkey(&self) -> Pubkey {
+        Pubkey::new(bytes_of(self))
+    }
+}
 
 pub fn parse_dex_account<T: Pod>(data: Vec<u8>) -> T {
     let data_len = data.len() - 12;
