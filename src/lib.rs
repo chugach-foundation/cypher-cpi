@@ -1,5 +1,6 @@
 pub mod client;
 
+use std::mem::take;
 use anchor_lang::prelude::*;
 use jet_proto_math::Number;
 
@@ -161,13 +162,130 @@ impl CypherMarket {
     }
 }
 
-impl CypherUser {
-    /// gets the user's position for the given market index
-    pub fn get_user_position(&self, market_index: usize) -> Option<&UserPosition> {
-        if self.positions[market_index].market_idx == u8::default() {
-            return None;
+impl CypherUser {    
+    pub fn iter_positions<'a>(&'a self) -> impl Iterator<Item = &UserPosition> {
+        struct Iter<'a> {
+            positions: &'a [UserPosition],
         }
-        self.positions.get(market_index)
+        impl<'a> Iterator for Iter<'a> {
+            type Item = &'a UserPosition;
+            fn next(&mut self) -> Option<Self::Item> {
+                loop {
+                    match take(&mut self.positions).split_first() {
+                        Some((head, rems)) => {
+                            self.positions = rems;
+                            if head.market_idx < MARKETS_MAX_CNT as u8 {
+                                return Some(head);
+                            }
+                        }
+                        None => return None,
+                    }
+                }
+            }
+        }
+        Iter {
+            positions: &self.positions[..],
+        }
+    }
+
+    fn get_position_idx(&self, token_idx: usize) -> Option<usize> {
+        if token_idx == QUOTE_TOKEN_IDX {
+            Some(QUOTE_TOKEN_IDX)
+        } else {
+            self.positions
+                .iter()
+                .position(|p| (p.market_idx as usize) == token_idx)
+        }
+    }
+
+    /// gets the user's position for the given market index
+    pub fn get_position(&self, token_idx: usize) -> Option<&UserPosition> {
+        let idx = self.get_position_idx(token_idx);
+        if let Some(idx) = idx {
+            self.positions.get(idx)
+        } else {
+            None
+        }
+    }
+
+    /// gets the users's assets value
+    pub fn get_assets_value(&self, group: &CypherGroup) -> Number {
+        let quote_token = group.get_cypher_token(QUOTE_TOKEN_IDX).unwrap();
+        let quote_position = self.get_position(QUOTE_TOKEN_IDX);
+        let quote_deposits = if let Some(position) = quote_position {
+            position.total_deposits(quote_token)
+        } else {
+            Number::ZERO
+        };
+        let mut assets_value = quote_deposits;
+
+        for position in self.iter_positions() {
+            let market_idx = position.market_idx as usize;
+            let market = group.get_cypher_market(market_idx);
+            let market_price = if let Some(m) = market {
+                m.market_price
+            } else {
+                continue;
+            };
+            let oo_info = &position.oo_info;
+            if oo_info.is_account_open {
+                let oo_coin_value = oo_info.coin_total * market_price;
+                let oo_value = oo_coin_value + oo_info.pc_total + oo_info.referrer_rebates_accrued;
+                assets_value += oo_value.into();
+            }
+            assets_value += position.base_deposits() * market_price;
+        }
+        assets_value
+    }
+
+    /// gets the users's liabilities value
+    pub fn get_liabilities_value(&self, group: &CypherGroup) -> Number {
+        let quote_token = group.get_cypher_token(QUOTE_TOKEN_IDX).unwrap();
+        let quote_position = self.get_position(QUOTE_TOKEN_IDX);
+        let quote_borrows = if let Some(position) = quote_position {
+            position.total_borrows(quote_token)
+        } else {
+            Number::ZERO
+        };
+        let mut liabs_value = quote_borrows;
+
+        for position in self.iter_positions() {
+            let market_idx = position.market_idx as usize;
+            let market = group.get_cypher_market(market_idx);
+            let market_price = if let Some(m) = market {
+                m.market_price
+            } else {
+                continue;
+            };
+            liabs_value += position.base_borrows() * market_price;
+        }
+        liabs_value
+    }
+    
+    /// gets the user's margin c-ratio
+    pub fn get_margin_c_ratio(&self, group: &CypherGroup) -> Number {
+        let liabs_value = self.get_liabilities_value(group);
+        if liabs_value == Number::ZERO {
+            Number::MAX
+        } else {
+            let assets_value = self.get_assets_value(group);
+            assets_value / liabs_value
+        }
+    }
+
+    /// gets the user's margin c-ratio components
+    /// the first number is the margin c-ratio, the second number is the assets value and the third  number is the liabilites value
+    pub fn get_margin_c_ratio_components(
+        &self,
+        group: &CypherGroup,
+    ) -> (Number, Number, Number) {
+        let liabs_value = self.get_liabilities_value(group);
+        if liabs_value == Number::ZERO {
+            (Number::MAX, self.get_assets_value(group), liabs_value)
+        } else {
+            let assets_value = self.get_assets_value(group);
+            (assets_value / liabs_value, assets_value, liabs_value)
+        }
     }
 }
 
