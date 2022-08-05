@@ -22,7 +22,7 @@ mainnet-beta = []
 anchor-gen = "0.3.0"
 anchor-lang = ">=0.20"
 anchor-spl = { version= ">=0.20", features = ["token", "associated_token", "dex"] }
-solana-sdk = "~1.9.13"
+solana-sdk = "~1.10.25"
 serum_dex = { git = "https://github.com/chugach-foundation/serum-dex.git", rev="2fab8b9", features = ["fuzz", "no-entrypoint" ] }
 jet-proto-math = { git = "https://github.com/chugach-foundation/jet-program-libraries.git", rev="ac8909b" }
 bytemuck = { version = "1.4.0" }
