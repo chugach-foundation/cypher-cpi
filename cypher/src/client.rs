@@ -8,12 +8,13 @@ use {
         NoOpSettleFundsDex as SettleFundsDex, SettlePosition, WithdrawCollateral,
     },
     crate::constants::*,
-    anchor_lang::{prelude::*, system_program},
+    arrayref::array_ref,
+    anchor_lang::{prelude::*, system_program, ZeroCopy},
     anchor_spl::{dex, token, token::spl_token},
     bytemuck::{bytes_of, from_bytes, Pod},
     serum_dex::instruction::{CancelOrderInstructionV2, MarketInstruction, NewOrderInstructionV3},
     sha2::{Digest, Sha256},
-    solana_sdk::{instruction::Instruction, sysvar::SysvarId},
+    solana_sdk::{instruction::Instruction, sysvar::SysvarId, account::Account},
 };
 
 pub trait ToPubkey {
@@ -24,6 +25,13 @@ impl ToPubkey for [u64; 4] {
     fn to_pubkey(&self) -> Pubkey {
         Pubkey::new(bytes_of(self))
     }
+}
+
+pub fn get_zero_copy_account<T: ZeroCopy + Owner>(solana_account: &Account) -> Box<T> {
+    let data = &solana_account.data.as_slice();
+    let disc_bytes = array_ref![data, 0, 8];
+    assert_eq!(disc_bytes, &T::discriminator());
+    Box::new(*from_bytes::<T>(&data[8..std::mem::size_of::<T>() + 8]))
 }
 
 pub fn parse_dex_account<T: Pod>(data: Vec<u8>) -> T {
