@@ -156,7 +156,7 @@ pub fn deposit_collateral_ix(
     Instruction {
         accounts: accounts.to_account_metas(Some(false)),
         data: get_ix_data(
-            "DepositCollateral",
+            "deposit_collateral",
             AnchorSerialize::try_to_vec(&ix_data).unwrap(),
         ),
         program_id: crate::id(),
@@ -186,7 +186,7 @@ pub fn withdraw_collateral_ix(
     Instruction {
         accounts: accounts.to_account_metas(Some(false)),
         data: get_ix_data(
-            "WithdrawCollateral",
+            "withdraw_collateral",
             AnchorSerialize::try_to_vec(&ix_data).unwrap(),
         ),
         program_id: crate::id(),
@@ -215,7 +215,7 @@ pub fn liquidate_collateral_ix(
     Instruction {
         accounts: accounts.to_account_metas(Some(false)),
         data: get_ix_data(
-            "LiquidateCollateral",
+            "liquuidate_collateral",
             AnchorSerialize::try_to_vec(&ix_data).unwrap(),
         ),
         program_id: crate::id(),
@@ -237,7 +237,7 @@ pub fn settle_position_ix(
     Instruction {
         accounts: accounts.to_account_metas(Some(false)),
         data: get_ix_data(
-            "SettlePosition",
+            "settle_position",
             AnchorSerialize::try_to_vec(&ix_data).unwrap(),
         ),
         program_id: crate::id(),
