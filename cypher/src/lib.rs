@@ -272,6 +272,38 @@ impl CypherUser {
             (assets_value / liabs_value, assets_value, liabs_value)
         }
     }
+
+    /// checks if the user is bankrupt
+    pub fn is_bankrupt(&self, group: &CypherGroup) -> bool {
+        let quote_position = self.get_position(QUOTE_TOKEN_IDX).unwrap();
+        let mut largest_deposit_value =
+            quote_position.total_deposits(group.get_cypher_token(QUOTE_TOKEN_IDX).unwrap());
+        let mut lowest_borrow_price = if quote_position.base_borrows() > Number::ZERO {
+            1_u64
+        } else {
+            u64::MAX
+        };
+        for position in self.iter_positions() {
+            let market_idx = position.market_idx as usize;
+            let market_price = group.get_cypher_market(market_idx).unwrap().market_price;
+            // we can use native deposits here because cAssets don't accrue interest
+            let deposit_value =
+                position.base_deposits() * market_price;
+            largest_deposit_value = Number::max(largest_deposit_value, deposit_value);
+            if position.base_borrows() > Number::ZERO {
+                lowest_borrow_price = lowest_borrow_price.min(market_price);
+            }
+        }
+
+        if lowest_borrow_price == u64::MAX {
+            return false;
+        }
+
+        let liq_fee = group.liq_liqor_fee() + group.liq_insurance_fee();
+        let collateral_for_min_borrow_unit = (liq_fee * lowest_borrow_price).as_u64_ceil(0);
+
+        collateral_for_min_borrow_unit > largest_deposit_value.as_u64(0)
+    }
 }
 
 impl UserPosition {
