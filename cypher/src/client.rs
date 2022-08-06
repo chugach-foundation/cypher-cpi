@@ -12,6 +12,7 @@ use {
     anchor_spl::{dex, token, token::spl_token},
     bytemuck::{bytes_of, from_bytes, Pod},
     serum_dex::instruction::{CancelOrderInstructionV2, MarketInstruction, NewOrderInstructionV3},
+    sha2::{Digest, Sha256},
     solana_sdk::{instruction::Instruction, sysvar::SysvarId},
 };
 
@@ -69,6 +70,49 @@ pub fn derive_open_orders_address(dex_market_pk: &Pubkey, cypher_user_pk: &Pubke
     )
 }
 
+#[derive(Clone, Default)]
+pub struct Hasher {
+    hasher: Sha256,
+}
+
+impl Hasher {
+    pub fn hash(&mut self, val: &[u8]) {
+        self.hasher.update(val);
+    }
+    pub fn hashv(&mut self, vals: &[&[u8]]) {
+        for val in vals {
+            self.hash(val);
+        }
+    }
+    pub fn result(self) -> [u8; 32] {
+        <[u8; 32]>::try_from(self.hasher.finalize().as_slice()).unwrap()
+    }
+}
+
+fn hashv(vals: &[&[u8]]) -> [u8; 32] {
+    let mut hasher = Hasher::default();
+    hasher.hashv(vals);
+    hasher.result()
+}
+
+fn hash(val: &[u8]) -> [u8; 32] {
+    hashv(&[val])
+}
+
+fn sighash(namespace: &str, name: &str) -> [u8; 8] {
+    let preimage = format!("{}:{}", namespace, name);
+
+    let mut sighash = [0u8; 8];
+    sighash.copy_from_slice(&hash(preimage.as_bytes())[..8]);
+    sighash
+}
+
+fn get_ix_data(name: &str, mut ix_data: Vec<u8>) -> Vec<u8> {
+    let mut data = sighash("global", name).to_vec();
+    data.append(&mut ix_data);
+    data
+}
+
 pub fn init_cypher_user_ix(
     cypher_group: &Pubkey,
     cypher_user: &Pubkey,
@@ -84,7 +128,10 @@ pub fn init_cypher_user_ix(
     let ix_data = crate::instruction::InitCypherUser { _bump: bump };
     Instruction {
         accounts: accounts.to_account_metas(Some(false)),
-        data: AnchorSerialize::try_to_vec(&ix_data).unwrap(),
+        data: get_ix_data(
+            "initCypherUser",
+            AnchorSerialize::try_to_vec(&ix_data).unwrap(),
+        ),
         program_id: crate::id(),
     }
 }
@@ -108,7 +155,10 @@ pub fn deposit_collateral_ix(
     let ix_data = crate::instruction::DepositCollateral { _amount: amount };
     Instruction {
         accounts: accounts.to_account_metas(Some(false)),
-        data: AnchorSerialize::try_to_vec(&ix_data).unwrap(),
+        data: get_ix_data(
+            "depositCollateral",
+            AnchorSerialize::try_to_vec(&ix_data).unwrap(),
+        ),
         program_id: crate::id(),
     }
 }
@@ -135,7 +185,10 @@ pub fn withdraw_collateral_ix(
 
     Instruction {
         accounts: accounts.to_account_metas(Some(false)),
-        data: AnchorSerialize::try_to_vec(&ix_data).unwrap(),
+        data: get_ix_data(
+            "withdrawCollateral",
+            AnchorSerialize::try_to_vec(&ix_data).unwrap(),
+        ),
         program_id: crate::id(),
     }
 }
@@ -161,7 +214,10 @@ pub fn liquidate_collateral_ix(
 
     Instruction {
         accounts: accounts.to_account_metas(Some(false)),
-        data: AnchorSerialize::try_to_vec(&ix_data).unwrap(),
+        data: get_ix_data(
+            "liquidateCollateral",
+            AnchorSerialize::try_to_vec(&ix_data).unwrap(),
+        ),
         program_id: crate::id(),
     }
 }
@@ -180,7 +236,10 @@ pub fn settle_position_ix(
 
     Instruction {
         accounts: accounts.to_account_metas(Some(false)),
-        data: AnchorSerialize::try_to_vec(&ix_data).unwrap(),
+        data: get_ix_data(
+            "settlePosition",
+            AnchorSerialize::try_to_vec(&ix_data).unwrap(),
+        ),
         program_id: crate::id(),
     }
 }
