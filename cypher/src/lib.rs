@@ -27,15 +27,6 @@ declare_id!("CYPHER79cJLzQ8iyyr6oeizfGgR9YU9NM9oTMPWak5oQ");
 #[cfg(not(feature = "mainnet-beta"))]
 declare_id!("8Z8nDAa98hgdYCS9SyAyAesxE3ZhAq8Qo1E8v2V8VU56");
 
-pub mod devnet_faucet {
-    use anchor_lang::declare_id;
-
-    #[cfg(feature = "devnet")]
-    declare_id!("7njrvFJx4NJQvzywv1LdnPwzYYTSh1wWgGL5vkwTUuSS");
-    #[cfg(not(feature = "devnet"))]
-    declare_id!("7njrvFJx4NJQvzywv1LdnPwzYYTSh1wWgGL5vkwTUuSS");
-}
-
 pub mod quote_mint {
     use anchor_lang::declare_id;
     #[cfg(feature = "mainnet-beta")]

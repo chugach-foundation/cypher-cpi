@@ -129,7 +129,7 @@ pub fn init_cypher_user_ix(
     Instruction {
         accounts: accounts.to_account_metas(Some(false)),
         data: get_ix_data(
-            "InitCypherUser",
+            "init_cypher_user",
             AnchorSerialize::try_to_vec(&ix_data).unwrap(),
         ),
         program_id: crate::id(),
