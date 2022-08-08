@@ -2,10 +2,8 @@ use anchor_lang::prelude::*;
 
 #[cfg(feature = "client")]
 use {
-    anchor_discriminator::get_ix_data,
-    anchor_spl::token::spl_token,
-    solana_sdk::instruction::Instruction,
-    std::str::FromStr,
+    anchor_discriminator::get_ix_data, anchor_spl::token::spl_token,
+    solana_sdk::instruction::Instruction, std::str::FromStr,
 };
 
 anchor_gen::generate_cpi_interface!(idl_path = "idl.json");
