@@ -1,5 +1,6 @@
 pub mod client;
 pub mod constants;
+pub mod utils;
 
 use anchor_lang::prelude::*;
 use constants::*;

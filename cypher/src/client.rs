@@ -1,4 +1,5 @@
 #![allow(dead_code)]
+#[cfg(feature = "client")]
 use {
     crate::accounts::{
         DepositCollateral, InitCypherUser, LiquidateCollateral, NoOpCancelOrder as CancelOrder,
@@ -7,82 +8,21 @@ use {
         NoOpNewOrderV3Dex as NewOrderV3Dex, NoOpSettleFunds as SettleFunds,
         NoOpSettleFundsDex as SettleFundsDex, SettlePosition, WithdrawCollateral,
     },
-    crate::constants::*,
-    arrayref::array_ref,
-    anchor_lang::{prelude::*, system_program, ZeroCopy},
-    anchor_spl::{dex, token, token::spl_token},
-    bytemuck::{bytes_of, from_bytes, Pod},
-    serum_dex::instruction::{CancelOrderInstructionV2, MarketInstruction, NewOrderInstructionV3},
     sha2::{Digest, Sha256},
-    solana_sdk::{instruction::Instruction, sysvar::SysvarId, account::Account},
+    anchor_lang::{prelude::*, system_program},
+    anchor_spl::{dex, token, token::spl_token},
+    serum_dex::instruction::{CancelOrderInstructionV2, MarketInstruction, NewOrderInstructionV3},
+    solana_sdk::{instruction::Instruction, sysvar::SysvarId},
 };
 
-pub trait ToPubkey {
-    fn to_pubkey(&self) -> Pubkey;
-}
 
-impl ToPubkey for [u64; 4] {
-    fn to_pubkey(&self) -> Pubkey {
-        Pubkey::new(bytes_of(self))
-    }
-}
-
-pub fn get_zero_copy_account<T: ZeroCopy + Owner>(solana_account: &Account) -> Box<T> {
-    let data = &solana_account.data.as_slice();
-    let disc_bytes = array_ref![data, 0, 8];
-    assert_eq!(disc_bytes, &T::discriminator());
-    Box::new(*from_bytes::<T>(&data[8..std::mem::size_of::<T>() + 8]))
-}
-
-pub fn parse_dex_account<T: Pod>(data: Vec<u8>) -> T {
-    let data_len = data.len() - 12;
-    let (_, rest) = data.split_at(5);
-    let (mid, _) = rest.split_at(data_len);
-    *from_bytes(mid)
-}
-
-pub fn gen_dex_vault_signer_key(nonce: u64, dex_market_pk: &Pubkey) -> Pubkey {
-    let seeds = [dex_market_pk.as_ref(), bytes_of(&nonce)];
-    Pubkey::create_program_address(&seeds, &dex::id()).unwrap()
-}
-
-pub fn derive_dex_market_authority(dex_market_pk: &Pubkey) -> Pubkey {
-    Pubkey::find_program_address(
-        &[B_DEX_MARKET_AUTHORITY, dex_market_pk.as_ref()],
-        &crate::id(),
-    )
-    .0
-}
-
-pub fn derive_cypher_user_address(cypher_group_pk: &Pubkey, owner_pk: &Pubkey) -> (Pubkey, u8) {
-    let (address, bump) = Pubkey::find_program_address(
-        &[
-            B_CYPHER_USER,
-            cypher_group_pk.as_ref(),
-            &owner_pk.to_bytes(),
-        ],
-        &crate::id(),
-    );
-
-    (address, bump)
-}
-
-pub fn derive_open_orders_address(dex_market_pk: &Pubkey, cypher_user_pk: &Pubkey) -> (Pubkey, u8) {
-    Pubkey::find_program_address(
-        &[
-            B_OPEN_ORDERS,
-            dex_market_pk.as_ref(),
-            cypher_user_pk.as_ref(),
-        ],
-        &crate::id(),
-    )
-}
-
+#[cfg(feature = "client")]
 #[derive(Clone, Default)]
 pub struct Hasher {
     hasher: Sha256,
 }
 
+#[cfg(feature = "client")]
 impl Hasher {
     pub fn hash(&mut self, val: &[u8]) {
         self.hasher.update(val);
@@ -97,16 +37,19 @@ impl Hasher {
     }
 }
 
+#[cfg(feature = "client")]
 fn hashv(vals: &[&[u8]]) -> [u8; 32] {
     let mut hasher = Hasher::default();
     hasher.hashv(vals);
     hasher.result()
 }
 
+#[cfg(feature = "client")]
 fn hash(val: &[u8]) -> [u8; 32] {
     hashv(&[val])
 }
 
+#[cfg(feature = "client")]
 fn sighash(namespace: &str, name: &str) -> [u8; 8] {
     let preimage = format!("{}:{}", namespace, name);
 
@@ -115,12 +58,14 @@ fn sighash(namespace: &str, name: &str) -> [u8; 8] {
     sighash
 }
 
+#[cfg(feature = "client")]
 fn get_ix_data(name: &str, mut ix_data: Vec<u8>) -> Vec<u8> {
     let mut data = sighash("global", name).to_vec();
     data.append(&mut ix_data);
     data
 }
 
+#[cfg(feature = "client")]
 pub fn init_cypher_user_ix(
     cypher_group: &Pubkey,
     cypher_user: &Pubkey,
@@ -144,6 +89,7 @@ pub fn init_cypher_user_ix(
     }
 }
 
+#[cfg(feature = "client")]
 pub fn deposit_collateral_ix(
     cypher_group: &Pubkey,
     cypher_user: &Pubkey,
@@ -171,6 +117,7 @@ pub fn deposit_collateral_ix(
     }
 }
 
+#[cfg(feature = "client")]
 pub fn withdraw_collateral_ix(
     cypher_group: &Pubkey,
     cypher_user: &Pubkey,
@@ -201,6 +148,7 @@ pub fn withdraw_collateral_ix(
     }
 }
 
+#[cfg(feature = "client")]
 pub fn liquidate_collateral_ix(
     cypher_group: &Pubkey,
     cypher_user: &Pubkey,
@@ -230,6 +178,7 @@ pub fn liquidate_collateral_ix(
     }
 }
 
+#[cfg(feature = "client")]
 pub fn settle_position_ix(
     cypher_group: &Pubkey,
     cypher_user: &Pubkey,
@@ -252,6 +201,7 @@ pub fn settle_position_ix(
     }
 }
 
+#[cfg(feature = "client")]
 pub fn init_open_orders_ix(
     cypher_group: &Pubkey,
     cypher_user: &Pubkey,
@@ -279,6 +229,7 @@ pub fn init_open_orders_ix(
     }
 }
 
+#[cfg(feature = "client")]
 pub fn close_open_orders_ix(
     cypher_group: &Pubkey,
     cypher_user: &Pubkey,
@@ -302,6 +253,7 @@ pub fn close_open_orders_ix(
     }
 }
 
+#[cfg(feature = "client")]
 #[allow(clippy::too_many_arguments)]
 pub fn new_order_v3_ix(
     cypher_group: &Pubkey,
@@ -355,6 +307,7 @@ pub fn new_order_v3_ix(
     }
 }
 
+#[cfg(feature = "client")]
 #[allow(clippy::too_many_arguments)]
 pub fn cancel_order_ix(
     cypher_group: &Pubkey,
@@ -405,6 +358,7 @@ pub fn cancel_order_ix(
     }
 }
 
+#[cfg(feature = "client")]
 #[allow(clippy::too_many_arguments)]
 pub fn cancel_order_by_client_id_ix(
     cypher_group: &Pubkey,
@@ -455,6 +409,7 @@ pub fn cancel_order_by_client_id_ix(
     }
 }
 
+#[cfg(feature = "client")]
 #[allow(clippy::too_many_arguments)]
 pub fn settle_funds_ix(
     cypher_group: &Pubkey,
@@ -496,6 +451,7 @@ pub fn settle_funds_ix(
     }
 }
 
+#[cfg(feature = "client")]
 pub fn consume_events_ix(
     cypher_group: &Pubkey,
     cypher_users: &[Pubkey],
