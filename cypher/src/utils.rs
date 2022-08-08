@@ -1,9 +1,9 @@
 #![allow(dead_code)]
 use {
     crate::constants::*,
-    arrayref::array_ref,
     anchor_lang::{prelude::*, ZeroCopy},
     anchor_spl::dex,
+    arrayref::array_ref,
     bytemuck::{bytes_of, from_bytes, Pod},
     solana_sdk::account::Account,
 };

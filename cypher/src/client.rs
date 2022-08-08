@@ -8,13 +8,25 @@ use {
         NoOpNewOrderV3Dex as NewOrderV3Dex, NoOpSettleFunds as SettleFunds,
         NoOpSettleFundsDex as SettleFundsDex, SettlePosition, WithdrawCollateral,
     },
-    sha2::{Digest, Sha256},
     anchor_lang::{prelude::*, system_program},
     anchor_spl::{dex, token, token::spl_token},
+    bytemuck::bytes_of,
     serum_dex::instruction::{CancelOrderInstructionV2, MarketInstruction, NewOrderInstructionV3},
+    sha2::{Digest, Sha256},
     solana_sdk::{instruction::Instruction, sysvar::SysvarId},
 };
 
+#[cfg(feature = "client")]
+pub trait ToPubkey {
+    fn to_pubkey(&self) -> Pubkey;
+}
+
+#[cfg(feature = "client")]
+impl ToPubkey for [u64; 4] {
+    fn to_pubkey(&self) -> Pubkey {
+        Pubkey::new(bytes_of(self))
+    }
+}
 
 #[cfg(feature = "client")]
 #[derive(Clone, Default)]

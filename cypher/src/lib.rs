@@ -288,8 +288,7 @@ impl CypherUser {
             let market_idx = position.market_idx as usize;
             let market_price = group.get_cypher_market(market_idx).unwrap().market_price;
             // we can use native deposits here because cAssets don't accrue interest
-            let deposit_value =
-                position.base_deposits() * market_price;
+            let deposit_value = position.base_deposits() * market_price;
             largest_deposit_value = Number::max(largest_deposit_value, deposit_value);
             if position.base_borrows() > Number::ZERO {
                 lowest_borrow_price = lowest_borrow_price.min(market_price);
