@@ -1,6 +1,7 @@
 #![allow(dead_code)]
 #[cfg(feature = "client")]
 use {
+    anchor_discriminator::get_ix_data,
     crate::accounts::{
         DepositCollateral, InitCypherUser, LiquidateCollateral, NoOpCancelOrder as CancelOrder,
         NoOpCancelOrderDex as CancelOrderDex, NoOpCloseOpenOrders as CloseOpenOrders,
@@ -12,7 +13,6 @@ use {
     anchor_spl::{dex, token, token::spl_token},
     bytemuck::bytes_of,
     serum_dex::instruction::{CancelOrderInstructionV2, MarketInstruction, NewOrderInstructionV3},
-    sha2::{Digest, Sha256},
     solana_sdk::{instruction::Instruction, sysvar::SysvarId},
 };
 
@@ -26,55 +26,6 @@ impl ToPubkey for [u64; 4] {
     fn to_pubkey(&self) -> Pubkey {
         Pubkey::new(bytes_of(self))
     }
-}
-
-#[cfg(feature = "client")]
-#[derive(Clone, Default)]
-pub struct Hasher {
-    hasher: Sha256,
-}
-
-#[cfg(feature = "client")]
-impl Hasher {
-    pub fn hash(&mut self, val: &[u8]) {
-        self.hasher.update(val);
-    }
-    pub fn hashv(&mut self, vals: &[&[u8]]) {
-        for val in vals {
-            self.hash(val);
-        }
-    }
-    pub fn result(self) -> [u8; 32] {
-        <[u8; 32]>::try_from(self.hasher.finalize().as_slice()).unwrap()
-    }
-}
-
-#[cfg(feature = "client")]
-fn hashv(vals: &[&[u8]]) -> [u8; 32] {
-    let mut hasher = Hasher::default();
-    hasher.hashv(vals);
-    hasher.result()
-}
-
-#[cfg(feature = "client")]
-fn hash(val: &[u8]) -> [u8; 32] {
-    hashv(&[val])
-}
-
-#[cfg(feature = "client")]
-fn sighash(namespace: &str, name: &str) -> [u8; 8] {
-    let preimage = format!("{}:{}", namespace, name);
-
-    let mut sighash = [0u8; 8];
-    sighash.copy_from_slice(&hash(preimage.as_bytes())[..8]);
-    sighash
-}
-
-#[cfg(feature = "client")]
-fn get_ix_data(name: &str, mut ix_data: Vec<u8>) -> Vec<u8> {
-    let mut data = sighash("global", name).to_vec();
-    data.append(&mut ix_data);
-    data
 }
 
 #[cfg(feature = "client")]

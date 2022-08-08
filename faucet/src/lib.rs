@@ -1,9 +1,12 @@
-use std::str::FromStr;
-
 use anchor_lang::prelude::*;
-use anchor_spl::token::spl_token;
-use sha2::{Digest, Sha256};
-use solana_sdk::instruction::Instruction;
+
+#[cfg(feature = "client")]
+use {
+    anchor_discriminator::get_ix_data,
+    anchor_spl::token::spl_token,
+    solana_sdk::instruction::Instruction,
+    std::str::FromStr,
+};
 
 anchor_gen::generate_cpi_interface!(idl_path = "idl.json");
 
@@ -20,50 +23,8 @@ pub mod quote_mint {
     declare_id!("DPhNUKVhnrkdbq37GUgTUBRbZLsvziX1p5e5YUXyjBsb");
 }
 
-#[derive(Clone, Default)]
-pub struct Hasher {
-    hasher: Sha256,
-}
-
-impl Hasher {
-    pub fn hash(&mut self, val: &[u8]) {
-        self.hasher.update(val);
-    }
-    pub fn hashv(&mut self, vals: &[&[u8]]) {
-        for val in vals {
-            self.hash(val);
-        }
-    }
-    pub fn result(self) -> [u8; 32] {
-        <[u8; 32]>::try_from(self.hasher.finalize().as_slice()).unwrap()
-    }
-}
-
-fn hashv(vals: &[&[u8]]) -> [u8; 32] {
-    let mut hasher = Hasher::default();
-    hasher.hashv(vals);
-    hasher.result()
-}
-
-fn hash(val: &[u8]) -> [u8; 32] {
-    hashv(&[val])
-}
-
-fn sighash(namespace: &str, name: &str) -> [u8; 8] {
-    let preimage = format!("{}:{}", namespace, name);
-
-    let mut sighash = [0u8; 8];
-    sighash.copy_from_slice(&hash(preimage.as_bytes())[..8]);
-    sighash
-}
-
-fn get_ix_data(name: &str, mut ix_data: Vec<u8>) -> Vec<u8> {
-    let mut data = sighash("global", name).to_vec();
-    data.append(&mut ix_data);
-    data
-}
-
-pub fn get_request_airdrop_ix(token_account: &Pubkey, amount: u64) -> Instruction {
+#[cfg(feature = "client")]
+pub fn request_airdrop_ix(token_account: &Pubkey, amount: u64) -> Instruction {
     let accounts = crate::accounts::FaucetToUser {
         faucet_info: Pubkey::from_str("9euKg1WZtat7iupnqZJPhVFUq1Eg3VJVAdAsv5T88Nf1").unwrap(),
         mint: quote_mint::ID,
