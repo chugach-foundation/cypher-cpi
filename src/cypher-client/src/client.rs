@@ -1,7 +1,6 @@
 #![allow(dead_code)]
-#[cfg(feature = "client")]
 use {
-    crate::accounts::{
+    cypher_cpi::accounts::{
         DepositCollateral, InitCypherUser, LiquidateCollateral, NoOpCancelOrder as CancelOrder,
         NoOpCancelOrderDex as CancelOrderDex, NoOpCloseOpenOrders as CloseOpenOrders,
         NoOpInitOpenOrders as InitOpenOrders, NoOpNewOrderV3 as NewOrderV3,
@@ -17,19 +16,16 @@ use {
     solana_sdk::{instruction::Instruction, sysvar::SysvarId},
 };
 
-#[cfg(feature = "client")]
 pub trait ToPubkey {
     fn to_pubkey(&self) -> Pubkey;
 }
 
-#[cfg(feature = "client")]
 impl ToPubkey for [u64; 4] {
     fn to_pubkey(&self) -> Pubkey {
         Pubkey::new(bytes_of(self))
     }
 }
 
-#[cfg(feature = "client")]
 pub fn init_cypher_user_ix(
     cypher_group: &Pubkey,
     cypher_user: &Pubkey,
@@ -42,18 +38,17 @@ pub fn init_cypher_user_ix(
         owner: *owner,
         system_program: system_program::ID,
     };
-    let ix_data = crate::instruction::InitCypherUser { _bump: bump };
+    let ix_data = cypher_cpi::instruction::InitCypherUser { _bump: bump };
     Instruction {
         accounts: accounts.to_account_metas(Some(false)),
         data: get_ix_data(
             "init_cypher_user",
             AnchorSerialize::try_to_vec(&ix_data).unwrap(),
         ),
-        program_id: crate::id(),
+        program_id: cypher_cpi::id(),
     }
 }
 
-#[cfg(feature = "client")]
 pub fn create_cypher_user_ix(
     cypher_group: &Pubkey,
     cypher_user: &Pubkey,
@@ -68,18 +63,17 @@ pub fn create_cypher_user_ix(
         payer: *payer,
         system_program: system_program::ID,
     };
-    let ix_data = crate::instruction::CreateCypherUser { _bump: bump };
+    let ix_data = cypher_cpi::instruction::CreateCypherUser { _bump: bump };
     Instruction {
         accounts: accounts.to_account_metas(Some(false)),
         data: get_ix_data(
             "create_cypher_user",
             AnchorSerialize::try_to_vec(&ix_data).unwrap(),
         ),
-        program_id: crate::id(),
+        program_id: cypher_cpi::id(),
     }
 }
 
-#[cfg(feature = "client")]
 pub fn close_cypher_user_ix(
     cypher_group: &Pubkey,
     cypher_user: &Pubkey,
@@ -90,18 +84,17 @@ pub fn close_cypher_user_ix(
         cypher_user: *cypher_user,
         user_signer: *owner,
     };
-    let ix_data = crate::instruction::CloseCypherUser {};
+    let ix_data = cypher_cpi::instruction::CloseCypherUser {};
     Instruction {
         accounts: accounts.to_account_metas(Some(false)),
         data: get_ix_data(
             "close_cypher_user",
             AnchorSerialize::try_to_vec(&ix_data).unwrap(),
         ),
-        program_id: crate::id(),
+        program_id: cypher_cpi::id(),
     }
 }
 
-#[cfg(feature = "client")]
 pub fn set_delegate_ix(
     cypher_group: &Pubkey,
     cypher_user: &Pubkey,
@@ -114,18 +107,17 @@ pub fn set_delegate_ix(
         user_signer: *owner,
         delegate: *delegate
     };
-    let ix_data = crate::instruction::SetDelegate {};
+    let ix_data = cypher_cpi::instruction::SetDelegate {};
     Instruction {
         accounts: accounts.to_account_metas(Some(false)),
         data: get_ix_data(
             "set_delegate",
             AnchorSerialize::try_to_vec(&ix_data).unwrap(),
         ),
-        program_id: crate::id(),
+        program_id: cypher_cpi::id(),
     }
 }
 
-#[cfg(feature = "client")]
 pub fn deposit_collateral_ix(
     cypher_group: &Pubkey,
     cypher_user: &Pubkey,
@@ -142,18 +134,17 @@ pub fn deposit_collateral_ix(
         deposit_from: *source_token_account,
         token_program: token::ID,
     };
-    let ix_data = crate::instruction::DepositCollateral { _amount: amount };
+    let ix_data = cypher_cpi::instruction::DepositCollateral { _amount: amount };
     Instruction {
         accounts: accounts.to_account_metas(Some(false)),
         data: get_ix_data(
             "deposit_collateral",
             AnchorSerialize::try_to_vec(&ix_data).unwrap(),
         ),
-        program_id: crate::id(),
+        program_id: cypher_cpi::id(),
     }
 }
 
-#[cfg(feature = "client")]
 pub fn withdraw_collateral_ix(
     cypher_group: &Pubkey,
     cypher_user: &Pubkey,
@@ -172,7 +163,7 @@ pub fn withdraw_collateral_ix(
         withdraw_to: *destination_token_account,
         token_program: token::ID,
     };
-    let ix_data = crate::instruction::WithdrawCollateral { _amount: amount };
+    let ix_data = cypher_cpi::instruction::WithdrawCollateral { _amount: amount };
 
     Instruction {
         accounts: accounts.to_account_metas(Some(false)),
@@ -180,11 +171,10 @@ pub fn withdraw_collateral_ix(
             "withdraw_collateral",
             AnchorSerialize::try_to_vec(&ix_data).unwrap(),
         ),
-        program_id: crate::id(),
+        program_id: cypher_cpi::id(),
     }
 }
 
-#[cfg(feature = "client")]
 pub fn liquidate_collateral_ix(
     cypher_group: &Pubkey,
     cypher_user: &Pubkey,
@@ -199,7 +189,7 @@ pub fn liquidate_collateral_ix(
         user_signer: *owner,
         liqee_cypher_user: *liqee_cypher_user,
     };
-    let ix_data = crate::instruction::LiquidateCollateral {
+    let ix_data = cypher_cpi::instruction::LiquidateCollateral {
         _asset_mint: *asset_mint,
         _liab_mint: *liability_mint,
     };
@@ -210,11 +200,10 @@ pub fn liquidate_collateral_ix(
             "liquidate_collateral",
             AnchorSerialize::try_to_vec(&ix_data).unwrap(),
         ),
-        program_id: crate::id(),
+        program_id: cypher_cpi::id(),
     }
 }
 
-#[cfg(feature = "client")]
 pub fn settle_position_ix(
     cypher_group: &Pubkey,
     cypher_user: &Pubkey,
@@ -225,7 +214,7 @@ pub fn settle_position_ix(
         cypher_user: *cypher_user,
         c_asset_mint: *c_asset_mint,
     };
-    let ix_data = crate::instruction::SettlePosition {};
+    let ix_data = cypher_cpi::instruction::SettlePosition {};
 
     Instruction {
         accounts: accounts.to_account_metas(Some(false)),
@@ -233,11 +222,10 @@ pub fn settle_position_ix(
             "settle_position",
             AnchorSerialize::try_to_vec(&ix_data).unwrap(),
         ),
-        program_id: crate::id(),
+        program_id: cypher_cpi::id(),
     }
 }
 
-#[cfg(feature = "client")]
 pub fn init_open_orders_ix(
     cypher_group: &Pubkey,
     cypher_user: &Pubkey,
@@ -261,11 +249,10 @@ pub fn init_open_orders_ix(
     Instruction {
         accounts: accounts.to_account_metas(Some(false)),
         data: MarketInstruction::InitOpenOrders.pack(),
-        program_id: crate::id(),
+        program_id: cypher_cpi::id(),
     }
 }
 
-#[cfg(feature = "client")]
 pub fn close_open_orders_ix(
     cypher_group: &Pubkey,
     cypher_user: &Pubkey,
@@ -285,11 +272,10 @@ pub fn close_open_orders_ix(
     Instruction {
         accounts: accounts.to_account_metas(Some(false)),
         data: MarketInstruction::CloseOpenOrders.pack(),
-        program_id: crate::id(),
+        program_id: cypher_cpi::id(),
     }
 }
 
-#[cfg(feature = "client")]
 #[allow(clippy::too_many_arguments)]
 pub fn new_order_v3_ix(
     cypher_group: &Pubkey,
@@ -337,13 +323,12 @@ pub fn new_order_v3_ix(
     };
 
     Instruction {
-        program_id: crate::id(),
+        program_id: cypher_cpi::id(),
         accounts: accounts.to_account_metas(Some(false)),
         data: MarketInstruction::NewOrderV3(data).pack(),
     }
 }
 
-#[cfg(feature = "client")]
 #[allow(clippy::too_many_arguments)]
 pub fn cancel_order_ix(
     cypher_group: &Pubkey,
@@ -388,13 +373,12 @@ pub fn cancel_order_ix(
     };
 
     Instruction {
-        program_id: crate::id(),
+        program_id: cypher_cpi::id(),
         accounts: accounts.to_account_metas(Some(false)),
         data: MarketInstruction::CancelOrderV2(data).pack(),
     }
 }
 
-#[cfg(feature = "client")]
 #[allow(clippy::too_many_arguments)]
 pub fn cancel_order_by_client_id_ix(
     cypher_group: &Pubkey,
@@ -439,13 +423,12 @@ pub fn cancel_order_by_client_id_ix(
     };
 
     Instruction {
-        program_id: crate::id(),
+        program_id: cypher_cpi::id(),
         accounts: accounts.to_account_metas(Some(false)),
         data: MarketInstruction::CancelOrderByClientIdV2(client_id).pack(),
     }
 }
 
-#[cfg(feature = "client")]
 #[allow(clippy::too_many_arguments)]
 pub fn settle_funds_ix(
     cypher_group: &Pubkey,
@@ -481,13 +464,12 @@ pub fn settle_funds_ix(
     };
 
     Instruction {
-        program_id: crate::id(),
+        program_id: cypher_cpi::id(),
         accounts: accounts.to_account_metas(Some(false)),
         data: MarketInstruction::SettleFunds.pack(),
     }
 }
 
-#[cfg(feature = "client")]
 pub fn consume_events_ix(
     cypher_group: &Pubkey,
     cypher_users: &[Pubkey],
@@ -511,7 +493,7 @@ pub fn consume_events_ix(
     accounts.extend(rem);
 
     Instruction {
-        program_id: crate::id(),
+        program_id: cypher_cpi::id(),
         accounts,
         data: MarketInstruction::ConsumeEventsPermissioned(limit).pack(),
     }
