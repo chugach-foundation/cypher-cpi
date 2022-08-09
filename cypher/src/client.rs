@@ -7,6 +7,7 @@ use {
         NoOpInitOpenOrders as InitOpenOrders, NoOpNewOrderV3 as NewOrderV3,
         NoOpNewOrderV3Dex as NewOrderV3Dex, NoOpSettleFunds as SettleFunds,
         NoOpSettleFundsDex as SettleFundsDex, SettlePosition, WithdrawCollateral,
+        CloseCypherUser, SetDelegate, CreateCypherUser,
     },
     anchor_discriminator::get_ix_data,
     anchor_lang::{prelude::*, system_program},
@@ -46,6 +47,78 @@ pub fn init_cypher_user_ix(
         accounts: accounts.to_account_metas(Some(false)),
         data: get_ix_data(
             "init_cypher_user",
+            AnchorSerialize::try_to_vec(&ix_data).unwrap(),
+        ),
+        program_id: crate::id(),
+    }
+}
+
+#[cfg(feature = "client")]
+pub fn create_cypher_user_ix(
+    cypher_group: &Pubkey,
+    cypher_user: &Pubkey,
+    owner: &Pubkey,
+    payer: &Pubkey,
+    bump: u8,
+) -> Instruction {
+    let accounts = CreateCypherUser {
+        cypher_group: *cypher_group,
+        cypher_user: *cypher_user,
+        owner: *owner,
+        payer: *payer,
+        system_program: system_program::ID,
+    };
+    let ix_data = crate::instruction::CreateCypherUser { _bump: bump };
+    Instruction {
+        accounts: accounts.to_account_metas(Some(false)),
+        data: get_ix_data(
+            "create_cypher_user",
+            AnchorSerialize::try_to_vec(&ix_data).unwrap(),
+        ),
+        program_id: crate::id(),
+    }
+}
+
+#[cfg(feature = "client")]
+pub fn close_cypher_user_ix(
+    cypher_group: &Pubkey,
+    cypher_user: &Pubkey,
+    owner: &Pubkey,
+) -> Instruction {
+    let accounts = CloseCypherUser {
+        cypher_group: *cypher_group,
+        cypher_user: *cypher_user,
+        user_signer: *owner,
+    };
+    let ix_data = crate::instruction::CloseCypherUser {};
+    Instruction {
+        accounts: accounts.to_account_metas(Some(false)),
+        data: get_ix_data(
+            "close_cypher_user",
+            AnchorSerialize::try_to_vec(&ix_data).unwrap(),
+        ),
+        program_id: crate::id(),
+    }
+}
+
+#[cfg(feature = "client")]
+pub fn set_delegate_ix(
+    cypher_group: &Pubkey,
+    cypher_user: &Pubkey,
+    owner: &Pubkey,
+    delegate: &Pubkey,
+) -> Instruction {
+    let accounts = SetDelegate {
+        cypher_group: *cypher_group,
+        cypher_user: *cypher_user,
+        user_signer: *owner,
+        delegate: *delegate
+    };
+    let ix_data = crate::instruction::SetDelegate {};
+    Instruction {
+        accounts: accounts.to_account_metas(Some(false)),
+        data: get_ix_data(
+            "set_delegate",
             AnchorSerialize::try_to_vec(&ix_data).unwrap(),
         ),
         program_id: crate::id(),
