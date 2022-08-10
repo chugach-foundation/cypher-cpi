@@ -1,10 +1,19 @@
 #![allow(dead_code)]
 use {
     crate::constants::*,
-    anchor_lang::prelude::*,
+    anchor_lang::{prelude::*, ZeroCopy},
     anchor_spl::dex,
+    arrayref::array_ref,
     bytemuck::{bytes_of, from_bytes, Pod},
+    solana_sdk::account::Account,
 };
+
+pub fn get_zero_copy_account<T: ZeroCopy + Owner>(solana_account: &Account) -> Box<T> {
+    let data = &solana_account.data.as_slice();
+    let disc_bytes = array_ref![data, 0, 8];
+    assert_eq!(disc_bytes, &T::discriminator());
+    Box::new(*from_bytes::<T>(&data[8..std::mem::size_of::<T>() + 8]))
+}
 
 pub fn parse_dex_account<T: Pod>(data: Vec<u8>) -> T {
     let data_len = data.len() - 12;

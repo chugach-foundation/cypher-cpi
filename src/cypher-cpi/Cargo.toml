@@ -22,5 +22,6 @@ anchor-discriminator = { path = "../anchor-discriminator/" }
 solana-sdk = "~1.10.25"
 solana-program = "~1.10.25"
 bytemuck = "1.4.0"
+arrayref = "0.3.6"
 serum_dex = { git = "https://github.com/chugach-foundation/serum-dex.git", rev="2fab8b9", features = ["fuzz", "no-entrypoint"] }
 jet-proto-math = { git = "https://github.com/chugach-foundation/jet-program-libraries.git", rev="ac8909b" }
