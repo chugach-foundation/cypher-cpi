@@ -642,6 +642,7 @@ dependencies = [
  "anchor-gen",
  "anchor-lang",
  "anchor-spl",
+ "arrayref",
  "bytemuck",
  "jet-proto-math",
  "serum_dex 0.5.6",
