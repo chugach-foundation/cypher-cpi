@@ -97,6 +97,99 @@
       ]
     },
     {
+      "name": "closeCypherUser",
+      "accounts": [
+        {
+          "name": "cypherGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "cypherUser",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userSigner",
+          "isMut": false,
+          "isSigner": true,
+          "docs": [
+            "We require the account's creator to sign the transaction."
+          ]
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "createCypherUser",
+      "accounts": [
+        {
+          "name": "cypherGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "cypherUser",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "bump",
+          "type": "u8"
+        },
+        {
+          "name": "accountNumber",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "setDelegate",
+      "accounts": [
+        {
+          "name": "cypherGroup",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "cypherUser",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userSigner",
+          "isMut": false,
+          "isSigner": true,
+          "docs": [
+            "We require the account's creator to sign the transaction."
+          ]
+        },
+        {
+          "name": "delegate",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "initPythProducts",
       "accounts": [
         {
@@ -807,7 +900,10 @@
         {
           "name": "userSigner",
           "isMut": false,
-          "isSigner": true
+          "isSigner": true,
+          "docs": [
+            "We require the account's creator to sign the transaction."
+          ]
         },
         {
           "name": "cypherPcVault",
@@ -944,22 +1040,37 @@
         "fields": [
           {
             "name": "selfAddress",
+            "docs": [
+              "address of this cypher group account."
+            ],
             "type": "publicKey"
           },
           {
             "name": "admin",
+            "docs": [
+              "admin who has permission to perform administrative ixs for this group."
+            ],
             "type": "publicKey"
           },
           {
             "name": "vaultSigner",
+            "docs": [
+              "signer pda for group owned vaults."
+            ],
             "type": "publicKey"
           },
           {
             "name": "insuranceFund",
+            "docs": [
+              "global insurance fund."
+            ],
             "type": "u64"
           },
           {
             "name": "markets",
+            "docs": [
+              "array of markets data."
+            ],
             "type": {
               "array": [
                 {
@@ -971,6 +1082,9 @@
           },
           {
             "name": "tokens",
+            "docs": [
+              "array of tokens data."
+            ],
             "type": {
               "array": [
                 {
@@ -982,12 +1096,18 @@
           },
           {
             "name": "config",
+            "docs": [
+              "group config set by admin."
+            ],
             "type": {
               "defined": "CypherGroupConfig"
             }
           },
           {
             "name": "vaultSignerBumpSeed",
+            "docs": [
+              "bump seed value for vault_signer pda."
+            ],
             "type": {
               "array": [
                 "u8",
@@ -1006,6 +1126,9 @@
           },
           {
             "name": "protocolFee",
+            "docs": [
+              "protocol fee collected ."
+            ],
             "type": "u64"
           },
           {
@@ -1027,14 +1150,23 @@
         "fields": [
           {
             "name": "cypherGroup",
+            "docs": [
+              "group address of market this price history is for."
+            ],
             "type": "publicKey"
           },
           {
             "name": "cAssetMint",
+            "docs": [
+              "c_asset_mint address of market this price history is for."
+            ],
             "type": "publicKey"
           },
           {
             "name": "data",
+            "docs": [
+              "array of price infos."
+            ],
             "type": {
               "array": [
                 {
@@ -1052,14 +1184,23 @@
           },
           {
             "name": "longerHead",
+            "docs": [
+              "head of prices for longer time horizon."
+            ],
             "type": "u16"
           },
           {
             "name": "shorterHead",
+            "docs": [
+              "head of prices for shorter time horizon."
+            ],
             "type": "u16"
           },
           {
             "name": "tail",
+            "docs": [
+              "tail of prices(most recently added price)."
+            ],
             "type": "u16"
           },
           {
@@ -1118,14 +1259,23 @@
         "fields": [
           {
             "name": "cypherGroup",
+            "docs": [
+              "address of cypher group account this user belongs to."
+            ],
             "type": "publicKey"
           },
           {
             "name": "userSigner",
+            "docs": [
+              "user's signer wallet."
+            ],
             "type": "publicKey"
           },
           {
             "name": "positions",
+            "docs": [
+              "user's margin account infos."
+            ],
             "type": {
               "array": [
                 {
@@ -1137,6 +1287,9 @@
           },
           {
             "name": "authorityBumpSeed",
+            "docs": [
+              "signer bump used to derive cypher_user address from user's signer wallet address."
+            ],
             "type": {
               "array": [
                 "u8",
@@ -1154,11 +1307,18 @@
             }
           },
           {
+            "name": "delegate",
+            "docs": [
+              "the user's delegate account"
+            ],
+            "type": "publicKey"
+          },
+          {
             "name": "padding2",
             "type": {
               "array": [
                 "u64",
-                10
+                6
               ]
             }
           }
@@ -1308,38 +1468,65 @@
         "fields": [
           {
             "name": "marginInitRatio",
+            "docs": [
+              "minimum c-ratio for a margin account to be considered healthy and able to borrow, trade or withdraw."
+            ],
             "type": "u16"
           },
           {
             "name": "marginMaintRatio",
+            "docs": [
+              "minimum c-ratio for a margin account before liquidation."
+            ],
             "type": "u16"
           },
           {
             "name": "marginPartialRatio",
+            "docs": [
+              "margin account partial liquidation target c-ratio."
+            ],
             "type": "u16"
           },
           {
             "name": "liquidatorBonusBps",
+            "docs": [
+              "liquidator bonus based on repay value."
+            ],
             "type": "u16"
           },
           {
             "name": "liquidationInsuranceFeeBps",
+            "docs": [
+              "liquidation fee for insurance fund based on repay value."
+            ],
             "type": "u16"
           },
           {
             "name": "makerFeeBps",
+            "docs": [
+              "maker order fees in bps"
+            ],
             "type": "u16"
           },
           {
             "name": "takerFeeBps",
+            "docs": [
+              "taker order fees in bps"
+            ],
             "type": "u16"
           },
           {
             "name": "feePercentageForProtocol",
+            "docs": [
+              "fee for protocol"
+            ],
             "type": "u8"
           },
           {
             "name": "feePercentageForInsuranceFund",
+            "docs": [
+              "fee for insurance fund"
+            ],
             "type": "u8"
           },
           {
@@ -1361,50 +1548,83 @@
         "fields": [
           {
             "name": "dexMarket",
+            "docs": [
+              "serum market address."
+            ],
             "type": "publicKey"
           },
           {
             "name": "priceHistory",
+            "docs": [
+              "price_history account address."
+            ],
             "type": "publicKey"
           },
           {
             "name": "pythProducts",
+            "docs": [
+              "pyth products account address."
+            ],
             "type": "publicKey"
           },
           {
             "name": "oraclePrice",
+            "docs": [
+              "oracle price"
+            ],
             "type": {
               "defined": "OraclePrice"
             }
           },
           {
             "name": "marketPrice",
+            "docs": [
+              "twap"
+            ],
             "type": "u64"
           },
           {
             "name": "positionsCount",
+            "docs": [
+              "number of positions in this market."
+            ],
             "type": "u64"
           },
           {
             "name": "listedAt",
+            "docs": [
+              "when this market was listed"
+            ],
             "type": "u64"
           },
           {
             "name": "expiresAt",
+            "docs": [
+              "when this market expires"
+            ],
             "type": "u64"
           },
           {
             "name": "marketType",
+            "docs": [
+              "market type"
+            ],
             "type": {
               "defined": "MarketType"
             }
           },
           {
             "name": "isExecuted",
+            "docs": [
+              "if this market is executed?"
+            ],
             "type": "bool"
           },
           {
             "name": "dexMarketAuthorityBumpSeed",
+            "docs": [
+              "bump seed value used to generate market_authority pda"
+            ],
             "type": {
               "array": [
                 "u8",
@@ -1465,14 +1685,23 @@
         "fields": [
           {
             "name": "mintInitRatio",
+            "docs": [
+              "minimum c-ratio required to issue cAssets, withdraw collateral and claim minting rewards."
+            ],
             "type": "u16"
           },
           {
             "name": "mintMaintRatio",
+            "docs": [
+              "maximum c-ratio where market collateral liquidation starts."
+            ],
             "type": "u16"
           },
           {
             "name": "mintPartialRatio",
+            "docs": [
+              "target c-ratio for a liquidation."
+            ],
             "type": "u16"
           },
           {
@@ -1494,14 +1723,23 @@
         "fields": [
           {
             "name": "mint",
+            "docs": [
+              "cAsset or usdc token mint address."
+            ],
             "type": "publicKey"
           },
           {
             "name": "vault",
+            "docs": [
+              "cypher token vault address."
+            ],
             "type": "publicKey"
           },
           {
             "name": "baseDeposits",
+            "docs": [
+              "index denominated deposit amount."
+            ],
             "type": {
               "array": [
                 "u8",
@@ -1511,6 +1749,9 @@
           },
           {
             "name": "baseBorrows",
+            "docs": [
+              "index denominated borrow amount."
+            ],
             "type": {
               "array": [
                 "u8",
@@ -1520,6 +1761,9 @@
           },
           {
             "name": "depositIndex",
+            "docs": [
+              "deposit index."
+            ],
             "type": {
               "array": [
                 "u8",
@@ -1529,6 +1773,9 @@
           },
           {
             "name": "borrowIndex",
+            "docs": [
+              "borrow index."
+            ],
             "type": {
               "array": [
                 "u8",
@@ -1556,10 +1803,16 @@
           },
           {
             "name": "indexUpdatedAt",
+            "docs": [
+              "index updated at."
+            ],
             "type": "u64"
           },
           {
             "name": "accumBorrows",
+            "docs": [
+              "native deposit amount."
+            ],
             "type": "u64"
           },
           {
@@ -1568,6 +1821,9 @@
           },
           {
             "name": "config",
+            "docs": [
+              "admin modifiable token configs."
+            ],
             "type": {
               "defined": "CypherTokenConfig"
             }
@@ -1591,18 +1847,30 @@
         "fields": [
           {
             "name": "optimalUtil",
+            "docs": [
+              "optimal utilization ratio for this token(lending pool)."
+            ],
             "type": "u16"
           },
           {
             "name": "optimalApr",
+            "docs": [
+              "optimal apr for this token(lending pool)."
+            ],
             "type": "u16"
           },
           {
             "name": "maxApr",
+            "docs": [
+              "maximum apr for this token(lending pool)."
+            ],
             "type": "u16"
           },
           {
             "name": "decimals",
+            "docs": [
+              "spl token decimals of this token"
+            ],
             "type": "u8"
           },
           {
@@ -1655,11 +1923,17 @@
     },
     {
       "name": "UserPosition",
+      "docs": [
+        "User's position in a margin account."
+      ],
       "type": {
         "kind": "struct",
         "fields": [
           {
             "name": "baseDeposits",
+            "docs": [
+              "keep track of deposit amount denominated by deposit index for all tokens."
+            ],
             "type": {
               "array": [
                 "u8",
@@ -1669,6 +1943,9 @@
           },
           {
             "name": "baseBorrows",
+            "docs": [
+              "keep track of borrow amount denominated by borrow index for all tokens."
+            ],
             "type": {
               "array": [
                 "u8",
@@ -1678,12 +1955,18 @@
           },
           {
             "name": "ooInfo",
+            "docs": [
+              "serum's OpenOrders account information for user in the market."
+            ],
             "type": {
               "defined": "OpenOrdersInfo"
             }
           },
           {
             "name": "marketIdx",
+            "docs": [
+              "index of this market from group."
+            ],
             "type": "u8"
           },
           {
@@ -1709,6 +1992,12 @@
     },
     {
       "name": "OpenOrdersInfo",
+      "docs": [
+        "Keep track of serum's OpenOrders account to calculate margin account c-ratio",
+        "without passing OpenOrders accounts for every single markets.",
+        "Quantities in this struct is native quantities(not need to multiply lot sizes).",
+        "This is updated in the permission market middleware."
+      ],
       "type": {
         "kind": "struct",
         "fields": [
@@ -1734,6 +2023,9 @@
           },
           {
             "name": "isAccountOpen",
+            "docs": [
+              "If the user has OpenOrders account open."
+            ],
             "type": "bool"
           },
           {
@@ -2098,8 +2390,41 @@
     },
     {
       "code": 6022,
+      "name": "InvalidSigner",
+      "msg": "invalid signer for the provided cypher user"
+    },
+    {
+      "code": 6023,
+      "name": "DelegateMustDiffer",
+      "msg": "desired delegate must be different than current delegate"
+    },
+    {
+      "code": 6024,
+      "name": "AccountHasQuoteTokenDepositsOrBorrows",
+      "msg": "tried to close an account with quote token deposits or borrows"
+    },
+    {
+      "code": 6025,
+      "name": "AccountHasOutstandingPositions",
+      "msg": "tried to close an account with outstanding positions"
+    },
+    {
+      "code": 6026,
+      "name": "AccountHasOpenOrders",
+      "msg": "tried to close an account with remaining open orders"
+    },
+    {
+      "code": 6027,
+      "name": "AccountHasUnclosedOpenOrdersAccounts",
+      "msg": "tried to close an account with unclosed open orders accounts"
+    },
+    {
+      "code": 6028,
       "name": "Default",
       "msg": "Default"
     }
-  ]
+  ],
+  "metadata": {
+    "address": "8Z8nDAa98hgdYCS9SyAyAesxE3ZhAq8Qo1E8v2V8VU56"
+  }
 }
