@@ -2,11 +2,12 @@
 #[cfg(feature = "client")]
 use {
     crate::accounts::{
-        DepositCollateral, InitCypherUser, LiquidateCollateral, NoOpCancelOrder as CancelOrder,
-        NoOpCancelOrderDex as CancelOrderDex, NoOpCloseOpenOrders as CloseOpenOrders,
-        NoOpInitOpenOrders as InitOpenOrders, NoOpNewOrderV3 as NewOrderV3,
-        NoOpNewOrderV3Dex as NewOrderV3Dex, NoOpSettleFunds as SettleFunds,
-        NoOpSettleFundsDex as SettleFundsDex, SettlePosition, WithdrawCollateral,
+        CloseCypherUser, CreateCypherUser, DepositCollateral, InitCypherUser, LiquidateCollateral,
+        NoOpCancelOrder as CancelOrder, NoOpCancelOrderDex as CancelOrderDex,
+        NoOpCloseOpenOrders as CloseOpenOrders, NoOpInitOpenOrders as InitOpenOrders,
+        NoOpNewOrderV3 as NewOrderV3, NoOpNewOrderV3Dex as NewOrderV3Dex,
+        NoOpSettleFunds as SettleFunds, NoOpSettleFundsDex as SettleFundsDex, SetDelegate,
+        SettlePosition, WithdrawCollateral,
     },
     anchor_discriminator::get_ix_data,
     anchor_lang::{prelude::*, system_program},
@@ -70,7 +71,7 @@ pub fn create_cypher_user_ix(
     };
     let ix_data = crate::instruction::CreateCypherUser {
         _bump: bump,
-        _account_number: account_number
+        _account_number: account_number,
     };
     Instruction {
         accounts: accounts.to_account_metas(Some(false)),
