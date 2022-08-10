@@ -24,7 +24,7 @@ anchor_gen::generate_cpi_interface!(
 );
 
 #[cfg(feature = "mainnet-beta")]
-declare_id!("CYPHER79cJLzQ8iyyr6oeizfGgR9YU9NM9oTMPWak5oQ");
+declare_id!("CYPHER3ziDd1rasgBcGGbx4fMtSS72x6NEM5Zvx2vNmK");
 #[cfg(not(feature = "mainnet-beta"))]
 declare_id!("8Z8nDAa98hgdYCS9SyAyAesxE3ZhAq8Qo1E8v2V8VU56");
 
