@@ -20,7 +20,7 @@ solana-sdk = "~1.10.25"
 anchor-gen = "0.3.0"
 bytemuck = { version = "1.4.0" }
 anchor-discriminator = { path = "../anchor-discriminator/", optional = true }
-anchor-lang = { git = "https://github.com/chugach-foundation/anchor.git", rev="9131d9f" }
-anchor-spl = { git = "https://github.com/chugach-foundation/anchor.git", rev="9131d9f", features = ["token", "associated_token", "dex"] }
+anchor-lang = ">=0.24.2"
+anchor-spl = { version = ">=0.24.2", features = [ "token", "associated_token", "dex" ] }
 serum_dex = { git = "https://github.com/chugach-foundation/serum-dex.git", rev = "2fab8b9", features = ["fuzz", "no-entrypoint" ] }
 jet-proto-math = { git = "https://github.com/chugach-foundation/jet-program-libraries.git", rev = "ac8909b" }
