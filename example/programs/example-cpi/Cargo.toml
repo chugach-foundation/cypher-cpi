@@ -16,5 +16,6 @@ cpi = ["no-entrypoint"]
 default = []
 
 [dependencies]
-anchor-lang = "0.24.2"
+anchor-lang = ">=0.24.2"
+anchor-spl = { version = ">=0.24.2", features = [ "token", "dex" ] }
 cypher-cpi = { path = "../../../src/cypher-cpi/" }

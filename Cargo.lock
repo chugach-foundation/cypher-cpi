@@ -797,26 +797,18 @@ dependencies = [
 ]
 
 [[package]]
-name = "cypher-client"
-version = "0.1.0"
-dependencies = [
- "anchor-discriminator",
- "anchor-lang 0.25.0",
- "anchor-spl 0.25.0",
- "arrayref",
- "bytemuck",
- "cypher-cpi",
- "serum_dex 0.5.6 (git+https://github.com/chugach-foundation/serum-dex.git?rev=2fab8b9)",
- "solana-sdk",
-]
-
-[[package]]
 name = "cypher-cpi"
 version = "0.1.0"
 dependencies = [
+ "anchor-discriminator",
  "anchor-gen",
  "anchor-lang 0.25.0",
+ "anchor-spl 0.25.0",
+ "bytemuck",
  "jet-proto-math",
+ "serum_dex 0.5.6 (git+https://github.com/chugach-foundation/serum-dex.git?rev=2fab8b9)",
+ "solana-program",
+ "solana-sdk",
 ]
 
 [[package]]

@@ -1,12 +1,12 @@
 #![allow(dead_code)]
 use {
-    cypher_cpi::accounts::{
-        DepositCollateral, InitCypherUser, LiquidateCollateral, NoOpCancelOrder as CancelOrder,
-        NoOpCancelOrderDex as CancelOrderDex, NoOpCloseOpenOrders as CloseOpenOrders,
-        NoOpInitOpenOrders as InitOpenOrders, NoOpNewOrderV3 as NewOrderV3,
-        NoOpNewOrderV3Dex as NewOrderV3Dex, NoOpSettleFunds as SettleFunds,
-        NoOpSettleFundsDex as SettleFundsDex, SettlePosition, WithdrawCollateral,
-        CloseCypherUser, SetDelegate, CreateCypherUser,
+    crate::accounts::{
+        CloseCypherUser, CreateCypherUser, DepositCollateral, InitCypherUser, LiquidateCollateral,
+        NoOpCancelOrder as CancelOrder, NoOpCancelOrderDex as CancelOrderDex,
+        NoOpCloseOpenOrders as CloseOpenOrders, NoOpInitOpenOrders as InitOpenOrders,
+        NoOpNewOrderV3 as NewOrderV3, NoOpNewOrderV3Dex as NewOrderV3Dex,
+        NoOpSettleFunds as SettleFunds, NoOpSettleFundsDex as SettleFundsDex, SetDelegate,
+        SettlePosition, WithdrawCollateral,
     },
     anchor_discriminator::get_ix_data,
     anchor_lang::{prelude::*, system_program},
@@ -38,14 +38,14 @@ pub fn init_cypher_user_ix(
         owner: *owner,
         system_program: system_program::ID,
     };
-    let ix_data = cypher_cpi::instruction::InitCypherUser { _bump: bump };
+    let ix_data = crate::instruction::InitCypherUser { _bump: bump };
     Instruction {
         accounts: accounts.to_account_metas(Some(false)),
         data: get_ix_data(
             "init_cypher_user",
             AnchorSerialize::try_to_vec(&ix_data).unwrap(),
         ),
-        program_id: cypher_cpi::id(),
+        program_id: crate::id(),
     }
 }
 
@@ -64,7 +64,7 @@ pub fn create_cypher_user_ix(
         payer: *payer,
         system_program: system_program::ID,
     };
-    let ix_data = cypher_cpi::instruction::CreateCypherUser {
+    let ix_data = crate::instruction::CreateCypherUser {
         _bump: bump,
         _account_number: account_number,
     };
@@ -74,7 +74,7 @@ pub fn create_cypher_user_ix(
             "create_cypher_user",
             AnchorSerialize::try_to_vec(&ix_data).unwrap(),
         ),
-        program_id: cypher_cpi::id(),
+        program_id: crate::id(),
     }
 }
 
@@ -88,14 +88,14 @@ pub fn close_cypher_user_ix(
         cypher_user: *cypher_user,
         user_signer: *owner,
     };
-    let ix_data = cypher_cpi::instruction::CloseCypherUser {};
+    let ix_data = crate::instruction::CloseCypherUser {};
     Instruction {
         accounts: accounts.to_account_metas(Some(false)),
         data: get_ix_data(
             "close_cypher_user",
             AnchorSerialize::try_to_vec(&ix_data).unwrap(),
         ),
-        program_id: cypher_cpi::id(),
+        program_id: crate::id(),
     }
 }
 
@@ -111,14 +111,14 @@ pub fn set_delegate_ix(
         user_signer: *owner,
         delegate: *delegate,
     };
-    let ix_data = cypher_cpi::instruction::SetDelegate {};
+    let ix_data = crate::instruction::SetDelegate {};
     Instruction {
         accounts: accounts.to_account_metas(Some(false)),
         data: get_ix_data(
             "set_delegate",
             AnchorSerialize::try_to_vec(&ix_data).unwrap(),
         ),
-        program_id: cypher_cpi::id(),
+        program_id: crate::id(),
     }
 }
 
@@ -138,14 +138,14 @@ pub fn deposit_collateral_ix(
         deposit_from: *source_token_account,
         token_program: token::ID,
     };
-    let ix_data = cypher_cpi::instruction::DepositCollateral { _amount: amount };
+    let ix_data = crate::instruction::DepositCollateral { _amount: amount };
     Instruction {
         accounts: accounts.to_account_metas(Some(false)),
         data: get_ix_data(
             "deposit_collateral",
             AnchorSerialize::try_to_vec(&ix_data).unwrap(),
         ),
-        program_id: cypher_cpi::id(),
+        program_id: crate::id(),
     }
 }
 
@@ -167,7 +167,7 @@ pub fn withdraw_collateral_ix(
         withdraw_to: *destination_token_account,
         token_program: token::ID,
     };
-    let ix_data = cypher_cpi::instruction::WithdrawCollateral { _amount: amount };
+    let ix_data = crate::instruction::WithdrawCollateral { _amount: amount };
 
     Instruction {
         accounts: accounts.to_account_metas(Some(false)),
@@ -175,7 +175,7 @@ pub fn withdraw_collateral_ix(
             "withdraw_collateral",
             AnchorSerialize::try_to_vec(&ix_data).unwrap(),
         ),
-        program_id: cypher_cpi::id(),
+        program_id: crate::id(),
     }
 }
 
@@ -193,7 +193,7 @@ pub fn liquidate_collateral_ix(
         user_signer: *owner,
         liqee_cypher_user: *liqee_cypher_user,
     };
-    let ix_data = cypher_cpi::instruction::LiquidateCollateral {
+    let ix_data = crate::instruction::LiquidateCollateral {
         _asset_mint: *asset_mint,
         _liab_mint: *liability_mint,
     };
@@ -204,7 +204,7 @@ pub fn liquidate_collateral_ix(
             "liquidate_collateral",
             AnchorSerialize::try_to_vec(&ix_data).unwrap(),
         ),
-        program_id: cypher_cpi::id(),
+        program_id: crate::id(),
     }
 }
 
@@ -218,7 +218,7 @@ pub fn settle_position_ix(
         cypher_user: *cypher_user,
         c_asset_mint: *c_asset_mint,
     };
-    let ix_data = cypher_cpi::instruction::SettlePosition {};
+    let ix_data = crate::instruction::SettlePosition {};
 
     Instruction {
         accounts: accounts.to_account_metas(Some(false)),
@@ -226,7 +226,7 @@ pub fn settle_position_ix(
             "settle_position",
             AnchorSerialize::try_to_vec(&ix_data).unwrap(),
         ),
-        program_id: cypher_cpi::id(),
+        program_id: crate::id(),
     }
 }
 
@@ -253,7 +253,7 @@ pub fn init_open_orders_ix(
     Instruction {
         accounts: accounts.to_account_metas(Some(false)),
         data: MarketInstruction::InitOpenOrders.pack(),
-        program_id: cypher_cpi::id(),
+        program_id: crate::id(),
     }
 }
 
@@ -276,7 +276,7 @@ pub fn close_open_orders_ix(
     Instruction {
         accounts: accounts.to_account_metas(Some(false)),
         data: MarketInstruction::CloseOpenOrders.pack(),
-        program_id: cypher_cpi::id(),
+        program_id: crate::id(),
     }
 }
 
@@ -327,14 +327,14 @@ pub fn new_order_v3_ix(
     };
 
     Instruction {
-        program_id: cypher_cpi::id(),
+        program_id: crate::id(),
         accounts: accounts.to_account_metas(Some(false)),
         data: MarketInstruction::NewOrderV3(data).pack(),
     }
 }
 
 #[allow(clippy::too_many_arguments)]
-pub fn cancel_order_ix(
+pub fn cancel_order_v2_ix(
     cypher_group: &Pubkey,
     vault_signer: &Pubkey,
     cypher_user: &Pubkey,
@@ -377,14 +377,14 @@ pub fn cancel_order_ix(
     };
 
     Instruction {
-        program_id: cypher_cpi::id(),
+        program_id: crate::id(),
         accounts: accounts.to_account_metas(Some(false)),
         data: MarketInstruction::CancelOrderV2(data).pack(),
     }
 }
 
 #[allow(clippy::too_many_arguments)]
-pub fn cancel_order_by_client_id_ix(
+pub fn cancel_order_by_client_id_v2_ix(
     cypher_group: &Pubkey,
     vault_signer: &Pubkey,
     cypher_user: &Pubkey,
@@ -427,7 +427,7 @@ pub fn cancel_order_by_client_id_ix(
     };
 
     Instruction {
-        program_id: cypher_cpi::id(),
+        program_id: crate::id(),
         accounts: accounts.to_account_metas(Some(false)),
         data: MarketInstruction::CancelOrderByClientIdV2(client_id).pack(),
     }
@@ -468,7 +468,7 @@ pub fn settle_funds_ix(
     };
 
     Instruction {
-        program_id: cypher_cpi::id(),
+        program_id: crate::id(),
         accounts: accounts.to_account_metas(Some(false)),
         data: MarketInstruction::SettleFunds.pack(),
     }
@@ -497,8 +497,173 @@ pub fn consume_events_ix(
     accounts.extend(rem);
 
     Instruction {
-        program_id: cypher_cpi::id(),
+        program_id: crate::id(),
         accounts,
         data: MarketInstruction::ConsumeEventsPermissioned(limit).pack(),
+    }
+}
+
+pub mod serum_cpi {
+    use super::*;
+    use crate::cpi::accounts::{
+        NoOpCancelOrder as CancelOrderCpi, NoOpCloseOpenOrders as CloseOpenOrdersCpi,
+        NoOpInitOpenOrders as InitOpenOrdersCpi, NoOpNewOrderV3 as NewOrderV3Cpi,
+        NoOpSettleFunds as SettleFundsCpi,
+    };
+
+    pub fn init_open_orders<'info>(
+        ctx: CpiContext<'_, '_, '_, 'info, InitOpenOrdersCpi<'info>>,
+    ) -> Result<()> {
+        let ix = init_open_orders_ix(
+            ctx.accounts.cypher_group.key,
+            ctx.accounts.cypher_user.key,
+            ctx.accounts.user_signer.key,
+            ctx.accounts.dex_market.key,
+            ctx.accounts.open_orders.key,
+            ctx.accounts.init_oo_authority.key,
+        );
+        solana_program::program::invoke_signed(
+            &ix,
+            &ToAccountInfos::to_account_infos(&ctx),
+            ctx.signer_seeds,
+        )?;
+        Ok(())
+    }
+
+    pub fn close_open_orders<'info>(
+        ctx: CpiContext<'_, '_, '_, 'info, CloseOpenOrdersCpi<'info>>,
+    ) -> Result<()> {
+        let ix = close_open_orders_ix(
+            ctx.accounts.cypher_group.key,
+            ctx.accounts.cypher_user.key,
+            ctx.accounts.user_signer.key,
+            ctx.accounts.dex_market.key,
+            ctx.accounts.open_orders.key,
+        );
+        solana_program::program::invoke_signed(
+            &ix,
+            &ToAccountInfos::to_account_infos(&ctx),
+            ctx.signer_seeds,
+        )?;
+        Ok(())
+    }
+
+    pub fn new_order_v3<'info>(
+        ctx: CpiContext<'_, '_, '_, 'info, NewOrderV3Cpi<'info>>,
+        data: NewOrderInstructionV3,
+    ) -> Result<()> {
+        let ix = new_order_v3_ix(
+            ctx.accounts.cypher_group.key,
+            ctx.accounts.vault_signer.key,
+            ctx.accounts.price_history.key,
+            ctx.accounts.cypher_user.key,
+            ctx.accounts.user_signer.key,
+            ctx.accounts.c_asset_mint.key,
+            ctx.accounts.cypher_c_asset_vault.key,
+            ctx.accounts.cypher_pc_vault.key,
+            ctx.accounts.NoOpNewOrderV3dex.market.key,
+            ctx.accounts.NoOpNewOrderV3dex.open_orders.key,
+            ctx.accounts.NoOpNewOrderV3dex.req_q.key,
+            ctx.accounts.NoOpNewOrderV3dex.event_q.key,
+            ctx.accounts.NoOpNewOrderV3dex.bids.key,
+            ctx.accounts.NoOpNewOrderV3dex.asks.key,
+            ctx.accounts.NoOpNewOrderV3dex.coin_vault.key,
+            ctx.accounts.NoOpNewOrderV3dex.vault_signer.key,
+            ctx.accounts.NoOpNewOrderV3dex.open_orders.key,
+            data,
+        );
+        solana_program::program::invoke_signed(
+            &ix,
+            &ToAccountInfos::to_account_infos(&ctx),
+            ctx.signer_seeds,
+        )?;
+        Ok(())
+    }
+
+    pub fn cancel_order_v2<'info>(
+        ctx: CpiContext<'_, '_, '_, 'info, CancelOrderCpi<'info>>,
+        data: CancelOrderInstructionV2,
+    ) -> Result<()> {
+        let ix = cancel_order_v2_ix(
+            ctx.accounts.cypher_group.key,
+            ctx.accounts.vault_signer.key,
+            ctx.accounts.cypher_user.key,
+            ctx.accounts.user_signer.key,
+            ctx.accounts.c_asset_mint.key,
+            ctx.accounts.cypher_c_asset_vault.key,
+            ctx.accounts.cypher_pc_vault.key,
+            ctx.accounts.NoOpCancelOrderdex.market.key,
+            ctx.accounts.NoOpCancelOrderdex.prune_authority.key,
+            ctx.accounts.NoOpCancelOrderdex.open_orders.key,
+            ctx.accounts.NoOpCancelOrderdex.event_q.key,
+            ctx.accounts.NoOpCancelOrderdex.bids.key,
+            ctx.accounts.NoOpCancelOrderdex.asks.key,
+            ctx.accounts.NoOpCancelOrderdex.coin_vault.key,
+            ctx.accounts.NoOpCancelOrderdex.pc_vault.key,
+            ctx.accounts.NoOpCancelOrderdex.vault_signer.key,
+            data,
+        );
+        solana_program::program::invoke_signed(
+            &ix,
+            &ToAccountInfos::to_account_infos(&ctx),
+            ctx.signer_seeds,
+        )?;
+        Ok(())
+    }
+
+    pub fn cancel_order_by_client_id_v2<'info>(
+        ctx: CpiContext<'_, '_, '_, 'info, CancelOrderCpi<'info>>,
+        client_order_id: u64,
+    ) -> Result<()> {
+        let ix = cancel_order_by_client_id_v2_ix(
+            ctx.accounts.cypher_group.key,
+            ctx.accounts.vault_signer.key,
+            ctx.accounts.cypher_user.key,
+            ctx.accounts.user_signer.key,
+            ctx.accounts.c_asset_mint.key,
+            ctx.accounts.cypher_c_asset_vault.key,
+            ctx.accounts.cypher_pc_vault.key,
+            ctx.accounts.NoOpCancelOrderdex.market.key,
+            ctx.accounts.NoOpCancelOrderdex.prune_authority.key,
+            ctx.accounts.NoOpCancelOrderdex.open_orders.key,
+            ctx.accounts.NoOpCancelOrderdex.event_q.key,
+            ctx.accounts.NoOpCancelOrderdex.bids.key,
+            ctx.accounts.NoOpCancelOrderdex.asks.key,
+            ctx.accounts.NoOpCancelOrderdex.coin_vault.key,
+            ctx.accounts.NoOpCancelOrderdex.pc_vault.key,
+            ctx.accounts.NoOpCancelOrderdex.vault_signer.key,
+            client_order_id,
+        );
+        solana_program::program::invoke_signed(
+            &ix,
+            &ToAccountInfos::to_account_infos(&ctx),
+            ctx.signer_seeds,
+        )?;
+        Ok(())
+    }
+
+    pub fn settle_funds<'info>(
+        ctx: CpiContext<'_, '_, '_, 'info, SettleFundsCpi<'info>>,
+    ) -> Result<()> {
+        let ix = settle_funds_ix(
+            ctx.accounts.cypher_group.key,
+            ctx.accounts.vault_signer.key,
+            ctx.accounts.cypher_user.key,
+            ctx.accounts.user_signer.key,
+            ctx.accounts.c_asset_mint.key,
+            ctx.accounts.cypher_c_asset_vault.key,
+            ctx.accounts.cypher_pc_vault.key,
+            ctx.accounts.NoOpSettleFundsdex.market.key,
+            ctx.accounts.NoOpSettleFundsdex.open_orders.key,
+            ctx.accounts.NoOpSettleFundsdex.coin_vault.key,
+            ctx.accounts.NoOpSettleFundsdex.pc_vault.key,
+            ctx.accounts.NoOpSettleFundsdex.vault_signer.key,
+        );
+        solana_program::program::invoke_signed(
+            &ix,
+            &ToAccountInfos::to_account_infos(&ctx),
+            ctx.signer_seeds,
+        )?;
+        Ok(())
     }
 }
