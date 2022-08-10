@@ -55,6 +55,7 @@ pub fn create_cypher_user_ix(
     owner: &Pubkey,
     payer: &Pubkey,
     bump: u8,
+    account_number: u64,
 ) -> Instruction {
     let accounts = CreateCypherUser {
         cypher_group: *cypher_group,
@@ -63,7 +64,10 @@ pub fn create_cypher_user_ix(
         payer: *payer,
         system_program: system_program::ID,
     };
-    let ix_data = crate::instruction::CreateCypherUser { _bump: bump };
+    let ix_data = crate::instruction::CreateCypherUser {
+        _bump: bump,
+        _account_number: account_number
+    };
     Instruction {
         accounts: accounts.to_account_metas(Some(false)),
         data: get_ix_data(

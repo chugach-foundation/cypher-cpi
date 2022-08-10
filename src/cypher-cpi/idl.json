@@ -153,6 +153,10 @@
         {
           "name": "bump",
           "type": "u8"
+        },
+        {
+          "name": "accountNumber",
+          "type": "u64"
         }
       ]
     },
