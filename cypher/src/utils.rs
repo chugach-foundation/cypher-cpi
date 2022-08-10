@@ -48,6 +48,20 @@ pub fn derive_cypher_user_address(cypher_group_pk: &Pubkey, owner_pk: &Pubkey) -
     (address, bump)
 }
 
+pub fn derive_cypher_user_address_with_number(cypher_group_pk: &Pubkey, owner_pk: &Pubkey, account_number: u64) -> (Pubkey, u8) {
+    let (address, bump) = Pubkey::find_program_address(
+        &[
+            B_CYPHER_USER,
+            cypher_group_pk.as_ref(),
+            &owner_pk.to_bytes(),
+            &account_number.to_le_bytes()
+        ],
+        &crate::id(),
+    );
+
+    (address, bump)
+}
+
 pub fn derive_open_orders_address(dex_market_pk: &Pubkey, cypher_user_pk: &Pubkey) -> (Pubkey, u8) {
     Pubkey::find_program_address(
         &[
