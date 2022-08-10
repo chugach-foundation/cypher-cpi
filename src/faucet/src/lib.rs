@@ -1,8 +1,8 @@
-use anchor_lang::prelude::*;
-
-#[cfg(feature = "client")]
+#[allow(dead_code)]
 use {
-    anchor_discriminator::get_ix_data, anchor_spl::token::spl_token,
+    anchor_lang::prelude::*,
+    anchor_discriminator::get_ix_data,
+    anchor_spl::token::spl_token,
     solana_sdk::instruction::Instruction, std::str::FromStr,
 };
 
@@ -21,7 +21,6 @@ pub mod quote_mint {
     declare_id!("DPhNUKVhnrkdbq37GUgTUBRbZLsvziX1p5e5YUXyjBsb");
 }
 
-#[cfg(feature = "client")]
 pub fn request_airdrop_ix(token_account: &Pubkey, amount: u64) -> Instruction {
     let accounts = crate::accounts::FaucetToUser {
         faucet_info: Pubkey::from_str("9euKg1WZtat7iupnqZJPhVFUq1Eg3VJVAdAsv5T88Nf1").unwrap(),
