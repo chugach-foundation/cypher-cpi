@@ -1,13 +1,19 @@
 #![allow(dead_code)]
 use {
     crate::constants::*,
-    anchor_lang::{prelude::*, ZeroCopy},
+    anchor_lang::prelude::*,
     anchor_spl::dex,
-    arrayref::array_ref,
     bytemuck::{bytes_of, from_bytes, Pod},
+};
+
+#[cfg(feature = "client")]
+use {
+    anchor_lang::ZeroCopy,
+    arrayref::array_ref,
     solana_sdk::account::Account,
 };
 
+#[cfg(feature = "client")]
 pub fn get_zero_copy_account<T: ZeroCopy + Owner>(solana_account: &Account) -> Box<T> {
     let data = &solana_account.data.as_slice();
     let disc_bytes = array_ref![data, 0, 8];

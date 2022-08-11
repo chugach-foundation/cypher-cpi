@@ -4,7 +4,7 @@ use anchor_spl::{
     dex::Dex
 };
 use std::mem::size_of;
-use cypher_cpi::{
+use cypher::{
     cpi::{
         accounts::{
             CreateCypherUser, DepositCollateral, WithdrawCollateral,
@@ -13,11 +13,11 @@ use cypher_cpi::{
         },
         create_cypher_user, deposit_collateral, withdraw_collateral
     },
-    client::{
-        new_order_v3, cancel_order, settle_funds
+    serum_cpi::{
+        new_order_v3, cancel_order_v2, settle_funds
     },
-    CypherGroup, CypherUser,
     program::Cypher,
+    CypherGroup, CypherUser, quote_mint
 };
 
 declare_id!("Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS");
@@ -25,7 +25,7 @@ declare_id!("Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS");
 #[program]
 pub mod example_cpi {
     use super::*;
-    use anchor_spl::dex::serum_dex::instruction::MarketInstruction;
+    use serum_dex::instruction::MarketInstruction;
 
     pub fn entry(program_id: &Pubkey, accounts: &[AccountInfo], data: &[u8]) -> Result<()> {
         let mut accounts = accounts;
@@ -54,6 +54,7 @@ pub mod example_cpi {
         ctx: Context<InitializeUser>,
         wrapper_bump: u8,
         cypher_user_bump: u8,
+        account_number: u64,
     ) -> Result<()> {
         let wrapper = &mut ctx.accounts.wrapper;
         let cypher_group = &ctx.accounts.cypher_group;
@@ -84,7 +85,7 @@ pub mod example_cpi {
             &signer_seeds
         );
 
-        create_cypher_user(cpi_ctx, cypher_user_bump)?;
+        create_cypher_user(cpi_ctx, cypher_user_bump, account_number)?;
         wrapper.bump = [wrapper_bump];
         wrapper.admin = admin.key();
         Ok(())
@@ -179,7 +180,7 @@ pub mod example_cpi {
 
 mod new_order {
     use super::*;
-    use anchor_spl::dex::serum_dex::instruction::NewOrderInstructionV3;
+    use serum_dex::instruction::NewOrderInstructionV3;
 
     pub fn handler(
         ctx: Context<NewOrder>,
@@ -240,6 +241,7 @@ mod new_order {
 
         new_order_v3(
             cpi_ctx,
+            ix_data
         )?;
 
         Ok(())
@@ -248,7 +250,7 @@ mod new_order {
 
 mod cancel_order {
     use super::*;
-    use anchor_spl::dex::serum_dex::instruction::CancelOrderInstructionV2;
+    use serum_dex::instruction::CancelOrderInstructionV2;
 
     pub fn handler(
         ctx: Context<CancelOrder>,
@@ -305,7 +307,8 @@ mod cancel_order {
         );
 
         cancel_order_v2(
-            cpi_ctx
+            cpi_ctx,
+            ix_data
         )?;
 
         Ok(())
@@ -491,7 +494,7 @@ pub struct Deposit<'info> {
 
     #[account(
         mut,
-        constraint = source_token_account.mint == cypher_cpi::quote_mint::ID,
+        constraint = source_token_account.mint == quote_mint::ID,
         constraint = source_token_account.owner == admin.key() || source_token_account.delegate.unwrap() == admin.key()
     )]
     pub source_token_account: Account<'info, TokenAccount>,
@@ -543,7 +546,7 @@ pub struct Withdraw<'info> {
 
     #[account(
         mut,
-        constraint = destination_token_account.mint == cypher_cpi::quote_mint::ID,
+        constraint = destination_token_account.mint == quote_mint::ID,
         constraint = destination_token_account.owner == admin.key() || destination_token_account.delegate.unwrap() == admin.key()
     )]
     pub destination_token_account: Account<'info, TokenAccount>,

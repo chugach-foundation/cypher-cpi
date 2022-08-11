@@ -18,4 +18,5 @@ default = []
 [dependencies]
 anchor-lang = ">=0.24.2"
 anchor-spl = { version = ">=0.24.2", features = [ "token", "dex" ] }
-cypher-cpi = { path = "../../../src/cypher-cpi/" }
+cypher = { path = "../../../src/cypher-cpi/" }
+serum_dex = { git = "https://github.com/chugach-foundation/serum-dex.git", rev = "2fab8b9", features = ["fuzz", "no-entrypoint" ] }
