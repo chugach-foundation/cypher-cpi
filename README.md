@@ -7,7 +7,7 @@ This repository is a CPI crate and client all-in-one, the CPI helpers for the [C
 In order to use this crate in your application, all you need to do is add the following line to the relevant `Cargo.toml`
 
 ```toml
-cypher = { git = "https://github.com/chugach-foundation/cypher-cpi.git", rev = "c6e9f07" }
+cypher = { git = "https://github.com/chugach-foundation/cypher-cpi.git" }
 ```
 
 ### Clients
@@ -17,7 +17,7 @@ If you're building a client application and will be interested in decoding Cyphe
 In your `Cargo.toml`, import `cypher` with the feature `"client"` (WARNING: May break compilation of on-chain programs, you should use `AccountLoader` for those):
 
 ```toml
-cypher = { git = "https://github.com/chugach-foundation/cypher-cpi.git", rev = "c6e9f07", features = [ "client" ] }
+cypher = { git = "https://github.com/chugach-foundation/cypher-cpi.git", features = [ "client" ] }
 ```
 
 With this feature enabled you can then do the following:
