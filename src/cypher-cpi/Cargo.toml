@@ -10,18 +10,21 @@ version = "0.1.0"
 [features]
 cpi = ["no-entrypoint"]
 default = ["cpi"]
-client = [ "dep:anchor-discriminator" ]
+client = [
+    "arrayref",
+    "solana-sdk"
+]
 no-entrypoint = []
 no-idl = []
 mainnet-beta = []
 
 [dependencies]
-solana-sdk = "~1.10.25"
+anchor-discriminator = { path = "../anchor-discriminator/" }
 anchor-gen = "0.3.0"
-arrayref = "0.3.6"
+anchor-lang = ">0.24.2"
+anchor-spl = { version = ">0.24.2", features = [ "token", "associated_token", "dex" ] }
+arrayref = { version = "0.3.6", optional = true }
 bytemuck = { version = "1.4.0" }
-anchor-discriminator = { path = "../anchor-discriminator/", optional = true }
-anchor-lang = { git = "https://github.com/chugach-foundation/anchor.git", rev="9131d9f" }
-anchor-spl = { git = "https://github.com/chugach-foundation/anchor.git", rev="9131d9f", features = ["token", "associated_token", "dex"] }
 serum_dex = { git = "https://github.com/chugach-foundation/serum-dex.git", rev = "2fab8b9", features = ["fuzz", "no-entrypoint" ] }
+solana-sdk = { version = ">=1.10.25", optional = true }
 jet-proto-math = { git = "https://github.com/chugach-foundation/jet-program-libraries.git", rev = "ac8909b" }

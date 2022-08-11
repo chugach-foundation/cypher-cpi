@@ -1,5 +1,4 @@
 #![allow(dead_code)]
-#[cfg(feature = "client")]
 use {
     crate::accounts::{
         CloseCypherUser, CreateCypherUser, DepositCollateral, InitCypherUser, LiquidateCollateral,
@@ -10,26 +9,22 @@ use {
         SettlePosition, WithdrawCollateral,
     },
     anchor_discriminator::get_ix_data,
-    anchor_lang::{prelude::*, system_program},
+    anchor_lang::{prelude::*, system_program, solana_program::{sysvar::SysvarId, instruction::Instruction}},
     anchor_spl::{dex, token, token::spl_token},
     bytemuck::bytes_of,
     serum_dex::instruction::{CancelOrderInstructionV2, MarketInstruction, NewOrderInstructionV3},
-    solana_sdk::{instruction::Instruction, sysvar::SysvarId},
 };
 
-#[cfg(feature = "client")]
 pub trait ToPubkey {
     fn to_pubkey(&self) -> Pubkey;
 }
 
-#[cfg(feature = "client")]
 impl ToPubkey for [u64; 4] {
     fn to_pubkey(&self) -> Pubkey {
         Pubkey::new(bytes_of(self))
     }
 }
 
-#[cfg(feature = "client")]
 pub fn init_cypher_user_ix(
     cypher_group: &Pubkey,
     cypher_user: &Pubkey,
@@ -53,7 +48,6 @@ pub fn init_cypher_user_ix(
     }
 }
 
-#[cfg(feature = "client")]
 pub fn create_cypher_user_ix(
     cypher_group: &Pubkey,
     cypher_user: &Pubkey,
@@ -83,7 +77,6 @@ pub fn create_cypher_user_ix(
     }
 }
 
-#[cfg(feature = "client")]
 pub fn close_cypher_user_ix(
     cypher_group: &Pubkey,
     cypher_user: &Pubkey,
@@ -105,7 +98,6 @@ pub fn close_cypher_user_ix(
     }
 }
 
-#[cfg(feature = "client")]
 pub fn set_delegate_ix(
     cypher_group: &Pubkey,
     cypher_user: &Pubkey,
@@ -129,7 +121,6 @@ pub fn set_delegate_ix(
     }
 }
 
-#[cfg(feature = "client")]
 pub fn deposit_collateral_ix(
     cypher_group: &Pubkey,
     cypher_user: &Pubkey,
@@ -157,7 +148,6 @@ pub fn deposit_collateral_ix(
     }
 }
 
-#[cfg(feature = "client")]
 pub fn withdraw_collateral_ix(
     cypher_group: &Pubkey,
     cypher_user: &Pubkey,
@@ -188,7 +178,6 @@ pub fn withdraw_collateral_ix(
     }
 }
 
-#[cfg(feature = "client")]
 pub fn liquidate_collateral_ix(
     cypher_group: &Pubkey,
     cypher_user: &Pubkey,
@@ -218,7 +207,6 @@ pub fn liquidate_collateral_ix(
     }
 }
 
-#[cfg(feature = "client")]
 pub fn settle_position_ix(
     cypher_group: &Pubkey,
     cypher_user: &Pubkey,
@@ -241,7 +229,6 @@ pub fn settle_position_ix(
     }
 }
 
-#[cfg(feature = "client")]
 pub fn init_open_orders_ix(
     cypher_group: &Pubkey,
     cypher_user: &Pubkey,
@@ -269,7 +256,6 @@ pub fn init_open_orders_ix(
     }
 }
 
-#[cfg(feature = "client")]
 pub fn close_open_orders_ix(
     cypher_group: &Pubkey,
     cypher_user: &Pubkey,
@@ -293,7 +279,6 @@ pub fn close_open_orders_ix(
     }
 }
 
-#[cfg(feature = "client")]
 #[allow(clippy::too_many_arguments)]
 pub fn new_order_v3_ix(
     cypher_group: &Pubkey,
@@ -347,9 +332,8 @@ pub fn new_order_v3_ix(
     }
 }
 
-#[cfg(feature = "client")]
 #[allow(clippy::too_many_arguments)]
-pub fn cancel_order_ix(
+pub fn cancel_order_v2_ix(
     cypher_group: &Pubkey,
     vault_signer: &Pubkey,
     cypher_user: &Pubkey,
@@ -398,9 +382,8 @@ pub fn cancel_order_ix(
     }
 }
 
-#[cfg(feature = "client")]
 #[allow(clippy::too_many_arguments)]
-pub fn cancel_order_by_client_id_ix(
+pub fn cancel_order_by_client_id_v2_ix(
     cypher_group: &Pubkey,
     vault_signer: &Pubkey,
     cypher_user: &Pubkey,
@@ -449,7 +432,6 @@ pub fn cancel_order_by_client_id_ix(
     }
 }
 
-#[cfg(feature = "client")]
 #[allow(clippy::too_many_arguments)]
 pub fn settle_funds_ix(
     cypher_group: &Pubkey,
@@ -491,7 +473,6 @@ pub fn settle_funds_ix(
     }
 }
 
-#[cfg(feature = "client")]
 pub fn consume_events_ix(
     cypher_group: &Pubkey,
     cypher_users: &[Pubkey],
