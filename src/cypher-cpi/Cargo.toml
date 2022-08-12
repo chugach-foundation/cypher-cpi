@@ -12,7 +12,6 @@ cpi = ["no-entrypoint"]
 default = ["cpi"]
 client = [
     "arrayref",
-    "solana-sdk"
 ]
 no-entrypoint = []
 no-idl = []
@@ -26,5 +25,4 @@ anchor-spl = { git = "https://github.com/chugach-foundation/anchor.git", feature
 arrayref = { version = "0.3.6", optional = true }
 bytemuck = "1.4.0"
 serum_dex = { git = "https://github.com/chugach-foundation/serum-dex.git", rev = "2fab8b9", features = ["fuzz", "no-entrypoint" ] }
-solana-sdk = { version = "~1.10.25", optional = true }
 jet-proto-math = { git = "https://github.com/chugach-foundation/jet-program-libraries.git", rev = "ac8909b" }

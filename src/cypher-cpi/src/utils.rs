@@ -10,15 +10,13 @@ use {
 use {
     anchor_lang::ZeroCopy,
     arrayref::array_ref,
-    solana_sdk::account::Account,
 };
 
 #[cfg(feature = "client")]
-pub fn get_zero_copy_account<T: ZeroCopy + Owner>(solana_account: &Account) -> Box<T> {
-    let data = &solana_account.data.as_slice();
-    let disc_bytes = array_ref![data, 0, 8];
+pub fn get_zero_copy_account<T: ZeroCopy + Owner>(account_data: &[u8]) -> Box<T> {
+    let disc_bytes = array_ref![account_data, 0, 8];
     assert_eq!(disc_bytes, &T::discriminator());
-    Box::new(*from_bytes::<T>(&data[8..std::mem::size_of::<T>() + 8]))
+    Box::new(*from_bytes::<T>(&account_data[8..std::mem::size_of::<T>() + 8]))
 }
 
 pub fn parse_dex_account<T: Pod>(data: Vec<u8>) -> T {
