@@ -29,20 +29,19 @@ pub mod example_cpi {
 
     pub fn entry(program_id: &Pubkey, accounts: &[AccountInfo], data: &[u8]) -> Result<()> {
         let mut accounts = accounts;
-        let mut reallocs = std::collections::BTreeSet::new();
         let mut bumps = std::collections::BTreeMap::new();
         let ix = MarketInstruction::unpack(data);
 
         match ix {
             Some(MarketInstruction::NewOrderV3(ix)) => {
                 let mut accounts =
-                    Accounts::try_accounts(program_id, &mut accounts, &[], &mut bumps, &mut reallocs)?;
+                    Accounts::try_accounts(program_id, &mut accounts, &[], &mut bumps)?;
                 let ctx = Context::new(program_id, &mut accounts, &[], bumps);
                 new_order::handler(ctx, ix)
             }
             Some(MarketInstruction::CancelOrderV2(ix)) => {
                 let mut accounts =
-                    Accounts::try_accounts(program_id, &mut accounts, &[], &mut bumps, &mut reallocs)?;
+                    Accounts::try_accounts(program_id, &mut accounts, &[], &mut bumps)?;
                 let ctx = Context::new(program_id, &mut accounts, &[], bumps);
                 cancel_order::handler(ctx, ix)
             }

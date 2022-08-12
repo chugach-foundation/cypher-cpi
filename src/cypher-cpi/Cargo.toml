@@ -21,8 +21,8 @@ mainnet-beta = []
 [dependencies]
 anchor-discriminator = { path = "../anchor-discriminator/" }
 anchor-gen = "0.3.0"
-anchor-lang = ">=0.24.2"
-anchor-spl = { version = ">=0.24.2", features = [ "token", "associated_token", "dex" ] }
+anchor-lang = { git = "https://github.com/chugach-foundation/anchor.git" }
+anchor-spl = { git = "https://github.com/chugach-foundation/anchor.git", features = [ "token", "associated_token", "dex" ] }
 arrayref = { version = "0.3.6", optional = true }
 bytemuck = "1.4.0"
 serum_dex = { git = "https://github.com/chugach-foundation/serum-dex.git", rev = "2fab8b9", features = ["fuzz", "no-entrypoint" ] }
