@@ -21,10 +21,10 @@ mainnet-beta = []
 [dependencies]
 anchor-discriminator = { path = "../anchor-discriminator/" }
 anchor-gen = "0.3.0"
-anchor-lang = ">0.24.2"
-anchor-spl = { version = ">0.24.2", features = [ "token", "associated_token", "dex" ] }
+anchor-lang = ">=0.24.2"
+anchor-spl = { version = ">=0.24.2", features = [ "token", "associated_token", "dex" ] }
 arrayref = { version = "0.3.6", optional = true }
-bytemuck = { version = "1.4.0" }
+bytemuck = "1.4.0"
 serum_dex = { git = "https://github.com/chugach-foundation/serum-dex.git", rev = "2fab8b9", features = ["fuzz", "no-entrypoint" ] }
-solana-sdk = { version = ">=1.10.25", optional = true }
+solana-sdk = { version = "~1.10.25", optional = true }
 jet-proto-math = { git = "https://github.com/chugach-foundation/jet-program-libraries.git", rev = "ac8909b" }

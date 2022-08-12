@@ -1,5 +1,6 @@
 [workspace]
 members = [
+    "testing",
     "src/cypher-cpi/",
     "src/faucet/",
     "src/anchor-discriminator/"
