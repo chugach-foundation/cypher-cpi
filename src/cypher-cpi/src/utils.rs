@@ -19,7 +19,7 @@ pub fn get_zero_copy_account<T: ZeroCopy + Owner>(account_data: &[u8]) -> Box<T>
     Box::new(*from_bytes::<T>(&account_data[8..std::mem::size_of::<T>() + 8]))
 }
 
-pub fn parse_dex_account<T: Pod>(data: Vec<u8>) -> T {
+pub fn parse_dex_account<T: Pod>(data: &[u8]) -> T {
     let data_len = data.len() - 12;
     let (_, rest) = data.split_at(5);
     let (mid, _) = rest.split_at(data_len);
