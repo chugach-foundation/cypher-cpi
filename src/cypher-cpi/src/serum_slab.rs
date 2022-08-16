@@ -261,7 +261,7 @@ const_assert_eq!(_NODE_ALIGN, align_of::<AnyNode>());
 
 #[derive(Debug, Copy, Clone)]
 #[repr(packed)]
-struct SlabHeader {
+pub struct SlabHeader {
     bump_index: u64,
     free_list_len: u64,
     free_list_head: u32,
@@ -379,11 +379,11 @@ impl Slab {
         (header, nodes)
     }
 
-    fn header(&self) -> &SlabHeader {
+    pub fn header(&self) -> &SlabHeader {
         self.parts().0
     }
 
-    fn nodes(&self) -> &[AnyNode] {
+    pub fn nodes(&self) -> &[AnyNode] {
         self.parts().1
     }
 }
