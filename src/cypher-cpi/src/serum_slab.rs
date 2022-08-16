@@ -320,7 +320,7 @@ impl Slab {
         slab
     }
 
-    //Each one of these does a preorder traversal
+    // Each one of these does a preorder traversal
     pub fn get_depth(
         &self,
         depth: u64,

@@ -778,7 +778,7 @@ dependencies = [
  "bytemuck",
  "jet-proto-math",
  "num_enum",
- "serum_dex 0.5.6 (git+https://github.com/chugach-foundation/serum-dex.git?rev=2fab8b9)",
+ "serum_dex 0.5.6 (git+https://github.com/chugach-foundation/serum-dex.git?rev=0353fbb)",
  "static_assertions",
 ]
 
@@ -1544,7 +1544,7 @@ dependencies = [
 [[package]]
 name = "serum_dex"
 version = "0.5.6"
-source = "git+https://github.com/chugach-foundation/serum-dex.git?rev=2fab8b9#2fab8b91cb0963e81ede434599bf13c9a0517dd1"
+source = "git+https://github.com/chugach-foundation/serum-dex.git?rev=0353fbb#0353fbb1376a4bbf3f273880990b9c087fa77659"
 dependencies = [
  "arbitrary",
  "arrayref",

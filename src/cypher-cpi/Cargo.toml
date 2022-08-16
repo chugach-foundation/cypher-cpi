@@ -26,5 +26,5 @@ arrayref = { version = "0.3.6", optional = true }
 bytemuck = "1.4.0"
 num_enum = "0.5.0"
 static_assertions = "1.1.0"
-serum_dex = { git = "https://github.com/chugach-foundation/serum-dex.git", rev = "2fab8b9", features = ["fuzz", "no-entrypoint" ] }
+serum_dex = { git = "https://github.com/chugach-foundation/serum-dex.git", rev = "0353fbb", features = ["fuzz", "no-entrypoint" ] }
 jet-proto-math = { git = "https://github.com/chugach-foundation/jet-program-libraries.git", rev = "ac8909b" }
