@@ -2,6 +2,7 @@ pub mod client;
 pub mod constants;
 pub mod utils;
 pub mod serum_cpi;
+pub mod serum_slab;
 
 use anchor_lang::prelude::*;
 use constants::*;
