@@ -232,6 +232,7 @@ pub fn settle_position_ix(
 pub fn init_open_orders_ix(
     cypher_group: &Pubkey,
     cypher_user: &Pubkey,
+    payer: &Pubkey,
     user_signer: &Pubkey,
     dex_market: &Pubkey,
     open_orders: &Pubkey,
@@ -240,6 +241,7 @@ pub fn init_open_orders_ix(
     let accounts = InitOpenOrders {
         cypher_group: *cypher_group,
         cypher_user: *cypher_user,
+        payer: *payer,
         user_signer: *user_signer,
         dex_market: *dex_market,
         init_oo_authority: *market_authority,

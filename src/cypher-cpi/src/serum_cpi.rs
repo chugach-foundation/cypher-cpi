@@ -19,6 +19,7 @@ pub fn init_open_orders<'info>(
     let ix = init_open_orders_ix(
         ctx.accounts.cypher_group.key,
         ctx.accounts.cypher_user.key,
+        ctx.accounts.payer.key,
         ctx.accounts.user_signer.key,
         ctx.accounts.dex_market.key,
         ctx.accounts.open_orders.key,

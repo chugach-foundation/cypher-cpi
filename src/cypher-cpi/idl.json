@@ -361,6 +361,11 @@
         },
         {
           "name": "userSigner",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
           "isMut": true,
           "isSigner": true
         },
