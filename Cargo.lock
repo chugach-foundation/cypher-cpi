@@ -1783,14 +1783,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "testing"
-version = "0.1.0"
-dependencies = [
- "anchor-lang 0.25.0",
- "cypher",
-]
-
-[[package]]
 name = "thiserror"
 version = "1.0.32"
 source = "registry+https://github.com/rust-lang/crates.io-index"

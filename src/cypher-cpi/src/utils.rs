@@ -1,18 +1,12 @@
 #![allow(dead_code)]
 use {
     crate::constants::*,
-    anchor_lang::prelude::*,
+    arrayref::array_ref,
+    anchor_lang::{prelude::*, ZeroCopy},
     anchor_spl::dex,
     bytemuck::{bytes_of, from_bytes, Pod},
 };
 
-#[cfg(feature = "client")]
-use {
-    anchor_lang::ZeroCopy,
-    arrayref::array_ref,
-};
-
-#[cfg(feature = "client")]
 pub fn get_zero_copy_account<T: ZeroCopy + Owner>(account_data: &[u8]) -> Box<T> {
     let disc_bytes = array_ref![account_data, 0, 8];
     assert_eq!(disc_bytes, &T::discriminator());
