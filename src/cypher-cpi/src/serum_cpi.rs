@@ -70,8 +70,8 @@ pub fn new_order_v3<'info>(
         ctx.accounts.NoOpNewOrderV3dex.bids.key,
         ctx.accounts.NoOpNewOrderV3dex.asks.key,
         ctx.accounts.NoOpNewOrderV3dex.coin_vault.key,
+        ctx.accounts.NoOpNewOrderV3dex.pc_vault.key,
         ctx.accounts.NoOpNewOrderV3dex.vault_signer.key,
-        ctx.accounts.NoOpNewOrderV3dex.open_orders.key,
         data,
     );
     invoke_signed(
