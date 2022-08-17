@@ -310,12 +310,12 @@ impl Slab {
     /// };
     /// ```
     #[inline]
-    pub fn new(bytes: &mut [u8]) -> &mut Self {
+    pub fn new(bytes: &[u8]) -> &Self {
         let len_without_header = bytes.len().checked_sub(SLAB_HEADER_LEN).unwrap();
         let slop = len_without_header % size_of::<AnyNode>();
         let truncated_len = bytes.len() - slop;
-        let bytes = &mut bytes[..truncated_len];
-        let slab: &mut Self = unsafe { &mut *(bytes as *mut [u8] as *mut Slab) };
+        let bytes = &bytes[..truncated_len];
+        let slab: &Self = unsafe { &(*(bytes as *const [u8] as *const Slab)) };
         slab.check_size_align(); // check alignment
         slab
     }

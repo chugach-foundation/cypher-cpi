@@ -10,9 +10,6 @@ version = "0.1.0"
 [features]
 cpi = ["no-entrypoint"]
 default = ["cpi"]
-client = [
-    "arrayref",
-]
 no-entrypoint = []
 no-idl = []
 mainnet-beta = []
@@ -22,7 +19,7 @@ anchor-discriminator = { path = "../anchor-discriminator/" }
 anchor-gen = "0.3.0"
 anchor-lang = { git = "https://github.com/chugach-foundation/anchor.git" }
 anchor-spl = { git = "https://github.com/chugach-foundation/anchor.git", features = [ "token", "associated_token", "dex" ] }
-arrayref = { version = "0.3.6", optional = true }
+arrayref = { version = "0.3.6"}
 bytemuck = "1.4.0"
 num_enum = "0.5.0"
 static_assertions = "1.1.0"
