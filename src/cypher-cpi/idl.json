@@ -902,6 +902,98 @@
       "args": []
     },
     {
+      "name": "activateMarket",
+      "accounts": [
+        {
+          "name": "cypherGroup",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "spotMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "cAssetMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "spotVault",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "cAssetVault",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "spotMarket",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "cAssetMarket",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "depositDerivativeDeliverable",
+      "accounts": [
+        {
+          "name": "cypherGroup",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userSigner",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "cypherVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "spotMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "cAssetMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "depositFrom",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
       "name": "depositCollateral",
       "accounts": [
         {
@@ -1002,7 +1094,42 @@
       ]
     },
     {
-      "name": "liquidateCollateral",
+      "name": "liquidateDerivativeCollateral",
+      "accounts": [
+        {
+          "name": "cypherGroup",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "cypherUser",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userSigner",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "liqeeCypherUser",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "assetMint",
+          "type": "publicKey"
+        },
+        {
+          "name": "liabMint",
+          "type": "publicKey"
+        }
+      ]
+    },
+    {
+      "name": "liquidateSpotCollateral",
       "accounts": [
         {
           "name": "cypherGroup",
@@ -1338,6 +1465,10 @@
           },
           {
             "name": "cAssetMint",
+            "type": "publicKey"
+          },
+          {
+            "name": "spotMint",
             "type": "publicKey"
           },
           {
@@ -1902,11 +2033,20 @@
             }
           },
           {
+            "name": "isActive",
+            "docs": [
+              "whether the market is active",
+              "i.e a physical delivery market should only be activated after equivalent amount of spot tokens",
+              "have been deposited to the spot vault"
+            ],
+            "type": "bool"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                4
+                3
               ]
             }
           }
@@ -2591,131 +2731,146 @@
     },
     {
       "code": 6005,
+      "name": "InvalidDeliveryType",
+      "msg": "invalid delivery type for specified market"
+    },
+    {
+      "code": 6006,
+      "name": "InvalidMarkets",
+      "msg": "invalid market pubkeys"
+    },
+    {
+      "code": 6007,
+      "name": "InsufficientBalanceForPhysicalDelivery",
+      "msg": "insufficient vault balance for physical delivery market"
+    },
+    {
+      "code": 6008,
       "name": "PythConfidenceNotAcceptable",
       "msg": "pyth conf not acceptable"
     },
     {
-      "code": 6006,
+      "code": 6009,
       "name": "PythPriceStatusNotTrading",
       "msg": "pyth conf not acceptable"
     },
     {
-      "code": 6007,
+      "code": 6010,
       "name": "StaleOraclePrice",
       "msg": "stale oracle price"
     },
     {
-      "code": 6008,
+      "code": 6011,
       "name": "UnableToFindTokenOrMarket",
       "msg": "unable to find token or market from cypher group"
     },
     {
-      "code": 6009,
+      "code": 6012,
       "name": "UnableToFindPosition",
       "msg": "unable to find position from cypher user"
     },
     {
-      "code": 6010,
+      "code": 6013,
       "name": "UnableToClosePosition",
       "msg": "unable to close position"
     },
     {
-      "code": 6011,
+      "code": 6014,
       "name": "UnableToExecuteMarket",
       "msg": "unable to execute market"
     },
     {
-      "code": 6012,
+      "code": 6015,
       "name": "EventQueueNotEmpty",
       "msg": "event queue not empty"
     },
     {
-      "code": 6013,
+      "code": 6016,
       "name": "InsufficientExecutionFund",
       "msg": "not enough execution fund"
     },
     {
-      "code": 6014,
+      "code": 6017,
       "name": "UnableToDelistMarket",
       "msg": "unable to delist market"
     },
     {
-      "code": 6015,
+      "code": 6018,
       "name": "UnableToDelistToken",
       "msg": "unable to delist token"
     },
     {
-      "code": 6016,
+      "code": 6019,
       "name": "ReachedMaxMarkets",
       "msg": "reached max markets"
     },
     {
-      "code": 6017,
+      "code": 6020,
       "name": "MarketNotActive",
       "msg": "market is not active"
     },
     {
-      "code": 6018,
+      "code": 6021,
       "name": "MarketNotExecuted",
       "msg": "market is not executed"
     },
     {
-      "code": 6019,
+      "code": 6022,
       "name": "OpenOrdersNotOpen",
       "msg": "open orders account is not open"
     },
     {
-      "code": 6020,
+      "code": 6023,
       "name": "CRatioBelowOptimal",
       "msg": "c-ratio is below optimal"
     },
     {
-      "code": 6021,
+      "code": 6024,
       "name": "BorrowsGreaterThanDeposits",
       "msg": "market total borrows amount is greater than total deposits"
     },
     {
-      "code": 6022,
+      "code": 6025,
       "name": "OrderAmountExceedsVaultBalance",
       "msg": "order amount exceeds balance of the corresponding vault"
     },
     {
-      "code": 6023,
+      "code": 6026,
       "name": "InvalidLiquidation",
       "msg": "tried to liquidate a healthy position"
     },
     {
-      "code": 6024,
+      "code": 6027,
       "name": "InvalidSigner",
       "msg": "invalid signer for the provided cypher user"
     },
     {
-      "code": 6025,
+      "code": 6028,
       "name": "DelegateMustDiffer",
       "msg": "desired delegate must be different than current delegate"
     },
     {
-      "code": 6026,
+      "code": 6029,
       "name": "AccountHasQuoteTokenDepositsOrBorrows",
       "msg": "tried to close an account with quote token deposits or borrows"
     },
     {
-      "code": 6027,
+      "code": 6030,
       "name": "AccountHasOutstandingPositions",
       "msg": "tried to close an account with outstanding positions"
     },
     {
-      "code": 6028,
+      "code": 6031,
       "name": "AccountHasOpenOrders",
       "msg": "tried to close an account with remaining open orders"
     },
     {
-      "code": 6029,
+      "code": 6032,
       "name": "AccountHasUnclosedOpenOrdersAccounts",
       "msg": "tried to close an account with unclosed open orders accounts"
     },
     {
-      "code": 6030,
+      "code": 6033,
       "name": "Default",
       "msg": "Default"
     }
