@@ -6,7 +6,7 @@ use {
     crate::{
         accounts::{
             CloseCypherUser, CreateCypherUser, DepositCollateral, InitCypherGroup, InitCypherUser,
-            InitPythProducts, LiquidateCollateral, NoOpCancelOrder as CancelOrder,
+            InitPythProducts, LiquidateDerivativeCollateral, LiquidateSpotCollateral, NoOpCancelOrder as CancelOrder,
             NoOpCancelOrderDex as CancelOrderDex, NoOpCloseOpenOrders as CloseOpenOrders,
             NoOpInitOpenOrders as InitOpenOrders, NoOpNewOrderV3 as NewOrderV3,
             NoOpNewOrderV3Dex as NewOrderV3Dex, NoOpSettleFunds as SettleFunds,
@@ -325,7 +325,7 @@ pub fn withdraw_collateral_ix(
     }
 }
 
-pub fn liquidate_collateral_ix(
+pub fn liquidate_derivative_collateral_ix(
     cypher_group: &Pubkey,
     cypher_user: &Pubkey,
     owner: &Pubkey,
@@ -333,13 +333,13 @@ pub fn liquidate_collateral_ix(
     asset_mint: &Pubkey,
     liability_mint: &Pubkey,
 ) -> Instruction {
-    let accounts = LiquidateCollateral {
+    let accounts = LiquidateDerivativeCollateral {
         cypher_group: *cypher_group,
         cypher_user: *cypher_user,
         user_signer: *owner,
         liqee_cypher_user: *liqee_cypher_user,
     };
-    let ix_data = crate::instruction::LiquidateCollateral {
+    let ix_data = crate::instruction::LiquidateDerivativeCollateral {
         _asset_mint: *asset_mint,
         _liab_mint: *liability_mint,
     };
@@ -347,7 +347,36 @@ pub fn liquidate_collateral_ix(
     Instruction {
         accounts: accounts.to_account_metas(Some(false)),
         data: get_ix_data(
-            "liquidate_collateral",
+            "liquidate_derivative_collateral",
+            AnchorSerialize::try_to_vec(&ix_data).unwrap(),
+        ),
+        program_id: crate::id(),
+    }
+}
+
+pub fn liquidate_spot_collateral_ix(
+    cypher_group: &Pubkey,
+    cypher_user: &Pubkey,
+    owner: &Pubkey,
+    liqee_cypher_user: &Pubkey,
+    asset_mint: &Pubkey,
+    liability_mint: &Pubkey,
+) -> Instruction {
+    let accounts = LiquidateSpotCollateral {
+        cypher_group: *cypher_group,
+        cypher_user: *cypher_user,
+        user_signer: *owner,
+        liqee_cypher_user: *liqee_cypher_user,
+    };
+    let ix_data = crate::instruction::LiquidateSpotCollateral {
+        _asset_mint: *asset_mint,
+        _liab_mint: *liability_mint,
+    };
+
+    Instruction {
+        accounts: accounts.to_account_metas(Some(false)),
+        data: get_ix_data(
+            "liquidate_spot_collateral",
             AnchorSerialize::try_to_vec(&ix_data).unwrap(),
         ),
         program_id: crate::id(),
