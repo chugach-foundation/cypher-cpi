@@ -1,12 +1,12 @@
 pub mod client;
 pub mod constants;
-pub mod utils;
 pub mod serum_cpi;
 pub mod serum_slab;
+pub mod utils;
 
 use anchor_lang::prelude::*;
 use constants::*;
-use jet_proto_math::Number;
+use fixed::types::I80F48;
 use std::mem::take;
 
 anchor_gen::generate_cpi_interface!(
@@ -28,7 +28,7 @@ anchor_gen::generate_cpi_interface!(
 #[cfg(feature = "mainnet-beta")]
 declare_id!("CYPHER3ziDd1rasgBcGGbx4fMtSS72x6NEM5Zvx2vNmK");
 #[cfg(not(feature = "mainnet-beta"))]
-declare_id!("8Z8nDAa98hgdYCS9SyAyAesxE3ZhAq8Qo1E8v2V8VU56");
+declare_id!("cyph3iWWJctHgNosbRqxg4GjMHsEL8wAPBnKzPRxEdF");
 
 pub mod quote_mint {
     use anchor_lang::declare_id;
@@ -40,33 +40,35 @@ pub mod quote_mint {
 
 impl CypherGroup {
     /// gets the group's margin initialization ratio
-    pub fn margin_init_ratio(&self) -> Number {
-        Number::from_percent(self.config.margin_init_ratio)
+    pub fn margin_init_ratio(&self) -> I80F48 {
+        I80F48::from(self.config.margin_init_ratio)
     }
 
     /// gets the group's margin maintenance ratio
-    pub fn margin_maint_ratio(&self) -> Number {
-        Number::from_percent(self.config.margin_maint_ratio)
+    pub fn margin_maint_ratio(&self) -> I80F48 {
+        I80F48::from(self.config.margin_maint_ratio)
     }
 
     /// gets the group's partial margin ratio, this is used as target ratio during liquidations
-    pub fn margin_partial_ratio(&self) -> Number {
-        Number::from_percent(self.config.margin_partial_ratio)
+    pub fn margin_partial_ratio(&self) -> I80F48 {
+        I80F48::from(self.config.margin_partial_ratio)
     }
 
     /// gets the group's liquidator bonus fee
-    pub fn liq_liqor_fee(&self) -> Number {
-        Number::ONE + Number::from_bps(self.config.liquidator_bonus_bps)
+    pub fn liq_liqor_fee(&self) -> I80F48 {
+        I80F48::ONE + I80F48::from(self.config.liquidator_bonus_bps)
     }
 
     /// gets the group's liquidation insurance fee
-    pub fn liq_insurance_fee(&self) -> Number {
-        Number::from_bps(self.config.liquidation_insurance_fee_bps)
+    pub fn liq_insurance_fee(&self) -> I80F48 {
+        I80F48::from(self.config.liquidation_insurance_fee_bps)
     }
 
     /// gets the cypher token at the given index
     pub fn get_cypher_token(&self, token_index: usize) -> Option<&CypherToken> {
-        if self.tokens[token_index].mint == Pubkey::default() {
+        if self.tokens[token_index].spot_mint == Pubkey::default()
+            && self.tokens[token_index].c_asset_mint == Pubkey::default()
+        {
             return None;
         }
         self.tokens.get(token_index)
@@ -74,18 +76,20 @@ impl CypherGroup {
 
     /// gets the cypher market at the given index
     pub fn get_cypher_market(&self, market_index: usize) -> Option<&CypherMarket> {
-        if self.tokens[market_index].mint == Pubkey::default() {
+        if self.markets[market_index].derivative_info.dex_market == Pubkey::default()
+            && self.markets[market_index].spot_info.spot_market == Pubkey::default()
+        {
             return None;
         }
         self.markets.get(market_index)
     }
 
     /// gets index of the token with the given `c_asset_mint`
-    pub fn get_token_idx(&self, mint: Pubkey) -> Option<usize> {
+    pub fn get_token_idx(&self, c_sset_mint: Pubkey) -> Option<usize> {
         self.tokens
             .iter()
-            .filter(|t| t.mint != Pubkey::default())
-            .position(|token| token.mint == mint)
+            .filter(|t| t.c_asset_mint != Pubkey::default() || t.spot_mint != Pubkey::default())
+            .position(|token| token.c_asset_mint == c_sset_mint)
     }
 
     /// gets index of the market with the given `c_asset_mint`
@@ -100,14 +104,14 @@ impl CypherGroup {
 
     /// gets the quote token vault pubkey
     pub fn quote_vault(&self) -> Pubkey {
-        self.tokens[QUOTE_TOKEN_IDX].vault
+        self.tokens[QUOTE_TOKEN_IDX].spot_vault
     }
 }
 
 impl CypherToken {
     /// checks whether the token is the quote token
     pub fn is_quote(&self) -> bool {
-        self.mint == quote_mint::ID
+        self.spot_mint == quote_mint::ID
     }
 
     /// gets the token's decimals
@@ -116,33 +120,43 @@ impl CypherToken {
     }
 
     /// gets the token's deposit index
-    pub fn deposit_index(&self) -> Number {
-        Number::from_bytes(self.deposit_index)
+    pub fn deposit_index(&self) -> I80F48 {
+        I80F48::from_bits(self.deposit_index)
     }
 
     /// gets the token's borrow index
-    pub fn borrow_index(&self) -> Number {
-        Number::from_bytes(self.borrow_index)
+    pub fn borrow_index(&self) -> I80F48 {
+        I80F48::from_bits(self.borrow_index)
     }
 
-    /// gets the base deposit amount
-    pub fn base_deposits(&self) -> Number {
-        Number::from_bytes(self.base_deposits)
+    /// gets the spot base deposit amount
+    pub fn spot_base_deposits(&self) -> I80F48 {
+        I80F48::from_bits(self.spot_base_deposits)
     }
 
-    /// gets the base borrows amount
-    pub fn base_borrows(&self) -> Number {
-        Number::from_bytes(self.base_borrows)
+    /// gets the spot base borrows amount
+    pub fn spot_base_borrows(&self) -> I80F48 {
+        I80F48::from_bits(self.spot_base_borrows)
+    }
+
+    /// gets the derivative base deposit amount
+    pub fn deriv_base_deposits(&self) -> I80F48 {
+        I80F48::from_bits(self.deriv_base_deposits)
+    }
+
+    /// gets the derivative base borrows amount
+    pub fn deriv_base_borrows(&self) -> I80F48 {
+        I80F48::from_bits(self.deriv_base_deposits)
     }
 
     /// gets the total deposits adjusted for the token's deposit index
-    pub fn total_deposits(&self) -> Number {
-        self.base_deposits() * self.deposit_index()
+    pub fn total_deposits(&self) -> I80F48 {
+        self.spot_base_deposits() * self.deposit_index()
     }
 
     /// gets the total borrows adjusted for the token's borrow index
-    pub fn total_borrows(&self) -> Number {
-        self.base_borrows() * self.borrow_index()
+    pub fn total_borrows(&self) -> I80F48 {
+        self.spot_base_borrows() * self.borrow_index()
     }
 }
 
@@ -200,43 +214,54 @@ impl CypherUser {
     }
 
     /// gets the users's assets value
-    pub fn get_assets_value(&self, group: &CypherGroup) -> Number {
+    pub fn get_assets_value(&self, group: &CypherGroup) -> I80F48 {
         let quote_token = group.get_cypher_token(QUOTE_TOKEN_IDX).unwrap();
         let quote_position = self.get_position(QUOTE_TOKEN_IDX);
         let quote_deposits = if let Some(position) = quote_position {
             position.total_deposits(quote_token)
         } else {
-            Number::ZERO
+            I80F48::ZERO
         };
         let mut assets_value = quote_deposits;
 
         for position in self.iter_positions() {
             let market_idx = position.market_idx as usize;
-            let market = group.get_cypher_market(market_idx);
-            let market_price = if let Some(m) = market {
-                m.market_price
-            } else {
-                continue;
+            let market = match group.get_cypher_market(market_idx) {
+                Some(m) => m,
+                None => {
+                    continue;
+                }
             };
-            let oo_info = &position.oo_info;
-            if oo_info.is_account_open {
-                let oo_coin_value = oo_info.coin_total * market_price;
-                let oo_value = oo_coin_value + oo_info.pc_total + oo_info.referrer_rebates_accrued;
-                assets_value += oo_value.into();
+            let market_price = I80F48::from(market.derivative_info.market_price);
+            let oracle_price = I80F48::from(market.oracle_price.price);
+            let deriv_oo_info = &position.deriv_oo_info;
+            if deriv_oo_info.is_account_open {
+                let oo_coin_value = I80F48::from(deriv_oo_info.coin_total) * market_price;
+                let oo_value = oo_coin_value
+                    + I80F48::from(deriv_oo_info.pc_total + deriv_oo_info.referrer_rebates_accrued);
+                assets_value += oo_value;
             }
-            assets_value += position.base_deposits() * market_price;
+            let spot_oo_info = &position.spot_oo_info;
+            if spot_oo_info.is_account_open {
+                let oo_coin_value = I80F48::from(spot_oo_info.coin_total) * market_price;
+                let oo_value = oo_coin_value
+                    + I80F48::from(spot_oo_info.pc_total + spot_oo_info.referrer_rebates_accrued);
+                assets_value += oo_value;
+            }
+            assets_value += position.deriv_base_deposits() * market_price;
+            assets_value += position.spot_base_deposits() * oracle_price;
         }
         assets_value
     }
 
     /// gets the users's liabilities value
-    pub fn get_liabilities_value(&self, group: &CypherGroup) -> Number {
+    pub fn get_liabilities_value(&self, group: &CypherGroup) -> I80F48 {
         let quote_token = group.get_cypher_token(QUOTE_TOKEN_IDX).unwrap();
         let quote_position = self.get_position(QUOTE_TOKEN_IDX);
         let quote_borrows = if let Some(position) = quote_position {
             position.total_borrows(quote_token)
         } else {
-            Number::ZERO
+            I80F48::ZERO
         };
         let mut liabs_value = quote_borrows;
 
@@ -244,20 +269,20 @@ impl CypherUser {
             let market_idx = position.market_idx as usize;
             let market = group.get_cypher_market(market_idx);
             let market_price = if let Some(m) = market {
-                m.market_price
+                I80F48::from(m.derivative_info.market_price)
             } else {
                 continue;
             };
-            liabs_value += position.base_borrows() * market_price;
+            liabs_value += position.deriv_base_borrows() * market_price;
         }
         liabs_value
     }
 
     /// gets the user's margin c-ratio
-    pub fn get_margin_c_ratio(&self, group: &CypherGroup) -> Number {
+    pub fn get_margin_c_ratio(&self, group: &CypherGroup) -> I80F48 {
         let liabs_value = self.get_liabilities_value(group);
-        if liabs_value == Number::ZERO {
-            Number::MAX
+        if liabs_value == I80F48::ZERO {
+            I80F48::MAX
         } else {
             let assets_value = self.get_assets_value(group);
             assets_value / liabs_value
@@ -266,10 +291,10 @@ impl CypherUser {
 
     /// gets the user's margin c-ratio components
     /// the first number is the margin c-ratio, the second number is the assets value and the third  number is the liabilites value
-    pub fn get_margin_c_ratio_components(&self, group: &CypherGroup) -> (Number, Number, Number) {
+    pub fn get_margin_c_ratio_components(&self, group: &CypherGroup) -> (I80F48, I80F48, I80F48) {
         let liabs_value = self.get_liabilities_value(group);
-        if liabs_value == Number::ZERO {
-            (Number::MAX, self.get_assets_value(group), liabs_value)
+        if liabs_value == I80F48::ZERO {
+            (I80F48::MAX, self.get_assets_value(group), liabs_value)
         } else {
             let assets_value = self.get_assets_value(group);
             (assets_value / liabs_value, assets_value, liabs_value)
@@ -281,18 +306,24 @@ impl CypherUser {
         let quote_position = self.get_position(QUOTE_TOKEN_IDX).unwrap();
         let mut largest_deposit_value =
             quote_position.total_deposits(group.get_cypher_token(QUOTE_TOKEN_IDX).unwrap());
-        let mut lowest_borrow_price = if quote_position.base_borrows() > Number::ZERO {
-            1_u64
+        let mut lowest_borrow_price = if quote_position.deriv_base_borrows() > I80F48::ZERO {
+            I80F48::ONE
         } else {
-            u64::MAX
+            I80F48::MAX
         };
         for position in self.iter_positions() {
             let market_idx = position.market_idx as usize;
-            let market_price = group.get_cypher_market(market_idx).unwrap().market_price;
+            let market_price = I80F48::from(
+                group
+                    .get_cypher_market(market_idx)
+                    .unwrap()
+                    .derivative_info
+                    .market_price,
+            );
             // we can use native deposits here because cAssets don't accrue interest
-            let deposit_value = position.base_deposits() * market_price;
-            largest_deposit_value = Number::max(largest_deposit_value, deposit_value);
-            if position.base_borrows() > Number::ZERO {
+            let deposit_value = position.deriv_base_deposits() * market_price;
+            largest_deposit_value = I80F48::max(largest_deposit_value, deposit_value);
+            if position.deriv_base_borrows() > I80F48::ZERO {
                 lowest_borrow_price = lowest_borrow_price.min(market_price);
             }
         }
@@ -302,30 +333,40 @@ impl CypherUser {
         }
 
         let liq_fee = group.liq_liqor_fee() + group.liq_insurance_fee();
-        let collateral_for_min_borrow_unit = (liq_fee * lowest_borrow_price).as_u64_ceil(0);
+        let collateral_for_min_borrow_unit = liq_fee * lowest_borrow_price;
 
-        collateral_for_min_borrow_unit > largest_deposit_value.as_u64(0)
+        collateral_for_min_borrow_unit > largest_deposit_value
     }
 }
 
 impl UserPosition {
     /// gets the base deposit amount
-    pub fn base_deposits(&self) -> Number {
-        Number::from_bytes(self.base_deposits)
+    pub fn spot_base_deposits(&self) -> I80F48 {
+        I80F48::from_bits(self.spot_base_deposits)
     }
 
     /// gets the base borrows amount
-    pub fn base_borrows(&self) -> Number {
-        Number::from_bytes(self.base_borrows)
+    pub fn spot_base_borrows(&self) -> I80F48 {
+        I80F48::from_bits(self.spot_base_borrows)
+    }
+
+    /// gets the base deposit amount
+    pub fn deriv_base_deposits(&self) -> I80F48 {
+        I80F48::from_bits(self.spot_base_deposits)
+    }
+
+    /// gets the base borrows amount
+    pub fn deriv_base_borrows(&self) -> I80F48 {
+        I80F48::from_bits(self.spot_base_borrows)
     }
 
     /// gets the user's total deposits adjusted for the token's deposit index
-    pub fn total_deposits(&self, cypher_token: &CypherToken) -> Number {
-        self.base_deposits() * cypher_token.deposit_index()
+    pub fn total_deposits(&self, cypher_token: &CypherToken) -> I80F48 {
+        self.spot_base_deposits() * cypher_token.deposit_index()
     }
 
     /// gets the user's total borrows adjusted for the token's borrow index
-    pub fn total_borrows(&self, cypher_token: &CypherToken) -> Number {
-        self.base_borrows() * cypher_token.borrow_index()
+    pub fn total_borrows(&self, cypher_token: &CypherToken) -> I80F48 {
+        self.spot_base_borrows() * cypher_token.borrow_index()
     }
 }

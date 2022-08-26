@@ -1,15 +1,26 @@
 #![allow(dead_code)]
+
+use anchor_spl::associated_token;
+
 use {
-    crate::accounts::{
-        CloseCypherUser, CreateCypherUser, DepositCollateral, InitCypherUser, LiquidateCollateral,
-        NoOpCancelOrder as CancelOrder, NoOpCancelOrderDex as CancelOrderDex,
-        NoOpCloseOpenOrders as CloseOpenOrders, NoOpInitOpenOrders as InitOpenOrders,
-        NoOpNewOrderV3 as NewOrderV3, NoOpNewOrderV3Dex as NewOrderV3Dex,
-        NoOpSettleFunds as SettleFunds, NoOpSettleFundsDex as SettleFundsDex, SetDelegate,
-        SettlePosition, WithdrawCollateral,
+    crate::{
+        accounts::{
+            CloseCypherUser, CreateCypherUser, DepositCollateral, InitCypherGroup, InitCypherUser,
+            InitPythProducts, LiquidateCollateral, NoOpCancelOrder as CancelOrder,
+            NoOpCancelOrderDex as CancelOrderDex, NoOpCloseOpenOrders as CloseOpenOrders,
+            NoOpInitOpenOrders as InitOpenOrders, NoOpNewOrderV3 as NewOrderV3,
+            NoOpNewOrderV3Dex as NewOrderV3Dex, NoOpSettleFunds as SettleFunds,
+            NoOpSettleFundsDex as SettleFundsDex, SetDelegate, SettlePosition, WithdrawCollateral,
+            InitSpotMarket, InitDerivativeMarket, InitDerivativeMarketDex
+        },
+        InitCypherGroupArgs, InitSpotMarketArgs, InitDerivativeMarketArgs
     },
     anchor_discriminator::get_ix_data,
-    anchor_lang::{prelude::*, system_program, solana_program::{sysvar::SysvarId, instruction::Instruction}},
+    anchor_lang::{
+        prelude::*,
+        solana_program::{instruction::Instruction, sysvar::SysvarId},
+        system_program,
+    },
     anchor_spl::{dex, token, token::spl_token},
     bytemuck::bytes_of,
     serum_dex::instruction::{CancelOrderInstructionV2, MarketInstruction, NewOrderInstructionV3},
@@ -22,6 +33,138 @@ pub trait ToPubkey {
 impl ToPubkey for [u64; 4] {
     fn to_pubkey(&self) -> Pubkey {
         Pubkey::new(bytes_of(self))
+    }
+}
+
+pub fn init_cypher_group_ix(
+    cypher_group: &Pubkey,
+    admin: &Pubkey,
+    payer: &Pubkey,
+    vault_signer: &Pubkey,
+    quote_mint: &Pubkey,
+    quote_vault: &Pubkey,
+    args: &InitCypherGroupArgs,
+) -> Instruction {
+    let accounts = InitCypherGroup {
+        cypher_group: *cypher_group,
+        admin: *admin,
+        payer: *payer,
+        vault_signer: *vault_signer,
+        quote_mint: *quote_mint,
+        quote_vault: *quote_vault,
+        token_program: token::ID,
+        system_program: system_program::ID,
+        associated_token_program: associated_token::ID,
+        rent: Rent::id(),
+    };
+    let ix_data = crate::instruction::InitCypherGroup {
+        _args: *args
+    };
+    Instruction {
+        program_id: crate::id(),
+        accounts: accounts.to_account_metas(Some(false)),
+        data: get_ix_data(
+            "init_cypher_group",
+            AnchorSerialize::try_to_vec(&ix_data).unwrap()
+        )
+    }
+}
+
+pub fn init_derivative_market_ix(
+    cypher_group: &Pubkey,
+    c_asset_mint: &Pubkey,
+    c_asset_vault: &Pubkey,
+    admin: &Pubkey,
+    vault_signer: &Pubkey,
+    quote_mint: &Pubkey,
+    pyth_products: &Pubkey,
+    dex_market_authority: &Pubkey,
+    price_history: &Pubkey,
+    args: &InitDerivativeMarketArgs,
+    dex: InitDerivativeMarketDex,
+) -> Instruction {
+    let accounts = InitDerivativeMarket {
+        cypher_group: *cypher_group,
+        admin: *admin,
+        vault_signer: *vault_signer,
+        c_asset_mint: *c_asset_mint,
+        c_asset_vault: *c_asset_vault,
+        dex_market_authority: *dex_market_authority,
+        pc_mint: *quote_mint,
+        pyth_products: *pyth_products,
+        price_history: *price_history,
+        token_program: token::ID,
+        InitDerivativeMarketdex: dex
+    };
+    let ix_data = crate::instruction::InitDerivativeMarket {
+        _args: *args
+    };
+    Instruction {
+        program_id: crate::id(),
+        accounts: accounts.to_account_metas(Some(false)),
+        data: get_ix_data(
+            "init_spot_market",
+            AnchorSerialize::try_to_vec(&ix_data).unwrap()
+        )
+    }
+}
+
+pub fn init_pyth_products_ix(
+    cypher_group: &Pubkey,
+    admin: &Pubkey,
+    pyth_products: &Pubkey,
+    weights: Vec<u16>
+) -> Instruction {
+    let accounts = InitPythProducts {
+        cypher_group: *cypher_group,
+        admin: *admin,
+        pyth_products: *pyth_products
+    };
+    let ix_data = crate::instruction::InitPythProducts {
+        _weights: weights
+    };
+    Instruction {
+        program_id: crate::id(),
+        accounts: accounts.to_account_metas(Some(false)),
+        data: get_ix_data(
+            "init_pyth_products",
+            AnchorSerialize::try_to_vec(&ix_data).unwrap()
+        )
+    }
+}
+
+pub fn init_spot_market_ix(
+    cypher_group: &Pubkey,
+    spot_mint: &Pubkey,
+    spot_market: &Pubkey,
+    spot_vault: &Pubkey,
+    admin: &Pubkey,
+    vault_signer: &Pubkey,
+    quote_mint: &Pubkey,
+    pyth_products: &Pubkey,
+    args: &InitSpotMarketArgs,
+) -> Instruction {
+    let accounts = InitSpotMarket {
+        cypher_group: *cypher_group,
+        admin: *admin,
+        vault_signer: *vault_signer,
+        spot_mint: *spot_mint,
+        spot_vault: *spot_vault,
+        market: *spot_market,
+        pc_mint: *quote_mint,
+        pyth_products: *pyth_products,
+        token_program: token::ID,
+    };
+    let ix_data = crate::instruction::InitSpotMarket {
+        _args: *args
+    };
+    Instruction {
+        program_id: crate::id(),
+        accounts: accounts.to_account_metas(Some(false)),
+        data: get_ix_data(
+            "init_spot_market",
+            AnchorSerialize::try_to_vec(&ix_data).unwrap()
+        )
     }
 }
 
@@ -124,7 +267,8 @@ pub fn set_delegate_ix(
 pub fn deposit_collateral_ix(
     cypher_group: &Pubkey,
     cypher_user: &Pubkey,
-    cypher_pc_vault: &Pubkey,
+    cypher_vault: &Pubkey,
+    spot_mint: &Pubkey,
     owner: &Pubkey,
     source_token_account: &Pubkey,
     amount: u64,
@@ -133,7 +277,8 @@ pub fn deposit_collateral_ix(
         cypher_group: *cypher_group,
         cypher_user: *cypher_user,
         user_signer: *owner,
-        cypher_pc_vault: *cypher_pc_vault,
+        spot_mint: *spot_mint,
+        cypher_vault: *cypher_vault,
         deposit_from: *source_token_account,
         token_program: token::ID,
     };
@@ -151,7 +296,8 @@ pub fn deposit_collateral_ix(
 pub fn withdraw_collateral_ix(
     cypher_group: &Pubkey,
     cypher_user: &Pubkey,
-    cypher_pc_vault: &Pubkey,
+    cypher_vault: &Pubkey,
+    spot_mint: &Pubkey,
     vault_signer: &Pubkey,
     owner: &Pubkey,
     destination_token_account: &Pubkey,
@@ -161,8 +307,9 @@ pub fn withdraw_collateral_ix(
         cypher_group: *cypher_group,
         cypher_user: *cypher_user,
         user_signer: *owner,
+        spot_mint: *spot_mint,
         vault_signer: *vault_signer,
-        cypher_pc_vault: *cypher_pc_vault,
+        cypher_vault: *cypher_vault,
         withdraw_to: *destination_token_account,
         token_program: token::ID,
     };

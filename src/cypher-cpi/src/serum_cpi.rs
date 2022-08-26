@@ -1,15 +1,15 @@
 #![allow(dead_code)]
 use {
+    crate::client::{
+        cancel_order_by_client_id_v2_ix, cancel_order_v2_ix, close_open_orders_ix,
+        init_open_orders_ix, new_order_v3_ix, settle_funds_ix,
+    },
     crate::cpi::accounts::{
         NoOpCancelOrder as CancelOrderCpi, NoOpCloseOpenOrders as CloseOpenOrdersCpi,
         NoOpInitOpenOrders as InitOpenOrdersCpi, NoOpNewOrderV3 as NewOrderV3Cpi,
         NoOpSettleFunds as SettleFundsCpi,
     },
-    crate::client::{
-        init_open_orders_ix, close_open_orders_ix,
-        new_order_v3_ix, cancel_order_v2_ix, cancel_order_by_client_id_v2_ix, settle_funds_ix,
-    },
-    anchor_lang::{prelude::*, solana_program::{program::invoke_signed}},
+    anchor_lang::{prelude::*, solana_program::program::invoke_signed},
     serum_dex::instruction::{CancelOrderInstructionV2, NewOrderInstructionV3},
 };
 

@@ -1,11 +1,10 @@
 #[allow(dead_code)]
 use {
-    anchor_lang::{prelude::*, solana_program::instruction::Instruction},
     anchor_discriminator::get_ix_data,
+    anchor_lang::{prelude::*, solana_program::instruction::Instruction},
     anchor_spl::token::spl_token,
     std::str::FromStr,
 };
-
 
 anchor_gen::generate_cpi_interface!(idl_path = "idl.json");
 
