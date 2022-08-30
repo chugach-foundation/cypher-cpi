@@ -15,6 +15,7 @@ use {
 
 pub fn init_open_orders<'info>(
     ctx: CpiContext<'_, '_, '_, 'info, InitOpenOrdersCpi<'info>>,
+    is_spot: bool
 ) -> Result<()> {
     let ix = init_open_orders_ix(
         ctx.accounts.cypher_group.key,
@@ -24,6 +25,7 @@ pub fn init_open_orders<'info>(
         ctx.accounts.dex_market.key,
         ctx.accounts.open_orders.key,
         ctx.accounts.init_oo_authority.key,
+        is_spot
     );
     invoke_signed(
         &ix,
@@ -35,6 +37,7 @@ pub fn init_open_orders<'info>(
 
 pub fn close_open_orders<'info>(
     ctx: CpiContext<'_, '_, '_, 'info, CloseOpenOrdersCpi<'info>>,
+    is_spot: bool
 ) -> Result<()> {
     let ix = close_open_orders_ix(
         ctx.accounts.cypher_group.key,
@@ -42,6 +45,7 @@ pub fn close_open_orders<'info>(
         ctx.accounts.user_signer.key,
         ctx.accounts.dex_market.key,
         ctx.accounts.open_orders.key,
+        is_spot
     );
     invoke_signed(
         &ix,
@@ -54,6 +58,7 @@ pub fn close_open_orders<'info>(
 pub fn new_order_v3<'info>(
     ctx: CpiContext<'_, '_, '_, 'info, NewOrderV3Cpi<'info>>,
     data: NewOrderInstructionV3,
+    is_spot: bool
 ) -> Result<()> {
     let ix = new_order_v3_ix(
         ctx.accounts.cypher_group.key,
@@ -61,8 +66,8 @@ pub fn new_order_v3<'info>(
         ctx.accounts.price_history.key,
         ctx.accounts.cypher_user.key,
         ctx.accounts.user_signer.key,
-        ctx.accounts.c_asset_mint.key,
-        ctx.accounts.cypher_c_asset_vault.key,
+        ctx.accounts.asset_mint.key,
+        ctx.accounts.cypher_asset_vault.key,
         ctx.accounts.cypher_pc_vault.key,
         ctx.accounts.NoOpNewOrderV3dex.market.key,
         ctx.accounts.NoOpNewOrderV3dex.open_orders.key,
@@ -74,6 +79,7 @@ pub fn new_order_v3<'info>(
         ctx.accounts.NoOpNewOrderV3dex.pc_vault.key,
         ctx.accounts.NoOpNewOrderV3dex.vault_signer.key,
         data,
+        is_spot
     );
     invoke_signed(
         &ix,
@@ -86,14 +92,15 @@ pub fn new_order_v3<'info>(
 pub fn cancel_order_v2<'info>(
     ctx: CpiContext<'_, '_, '_, 'info, CancelOrderCpi<'info>>,
     data: CancelOrderInstructionV2,
+    is_spot: bool
 ) -> Result<()> {
     let ix = cancel_order_v2_ix(
         ctx.accounts.cypher_group.key,
         ctx.accounts.vault_signer.key,
         ctx.accounts.cypher_user.key,
         ctx.accounts.user_signer.key,
-        ctx.accounts.c_asset_mint.key,
-        ctx.accounts.cypher_c_asset_vault.key,
+        ctx.accounts.asset_mint.key,
+        ctx.accounts.cypher_asset_vault.key,
         ctx.accounts.cypher_pc_vault.key,
         ctx.accounts.NoOpCancelOrderdex.market.key,
         ctx.accounts.NoOpCancelOrderdex.prune_authority.key,
@@ -105,6 +112,7 @@ pub fn cancel_order_v2<'info>(
         ctx.accounts.NoOpCancelOrderdex.pc_vault.key,
         ctx.accounts.NoOpCancelOrderdex.vault_signer.key,
         data,
+        is_spot
     );
     invoke_signed(
         &ix,
@@ -117,14 +125,15 @@ pub fn cancel_order_v2<'info>(
 pub fn cancel_order_by_client_id_v2<'info>(
     ctx: CpiContext<'_, '_, '_, 'info, CancelOrderCpi<'info>>,
     client_order_id: u64,
+    is_spot: bool
 ) -> Result<()> {
     let ix = cancel_order_by_client_id_v2_ix(
         ctx.accounts.cypher_group.key,
         ctx.accounts.vault_signer.key,
         ctx.accounts.cypher_user.key,
         ctx.accounts.user_signer.key,
-        ctx.accounts.c_asset_mint.key,
-        ctx.accounts.cypher_c_asset_vault.key,
+        ctx.accounts.asset_mint.key,
+        ctx.accounts.cypher_asset_vault.key,
         ctx.accounts.cypher_pc_vault.key,
         ctx.accounts.NoOpCancelOrderdex.market.key,
         ctx.accounts.NoOpCancelOrderdex.prune_authority.key,
@@ -136,6 +145,7 @@ pub fn cancel_order_by_client_id_v2<'info>(
         ctx.accounts.NoOpCancelOrderdex.pc_vault.key,
         ctx.accounts.NoOpCancelOrderdex.vault_signer.key,
         client_order_id,
+        is_spot
     );
     invoke_signed(
         &ix,
@@ -147,20 +157,22 @@ pub fn cancel_order_by_client_id_v2<'info>(
 
 pub fn settle_funds<'info>(
     ctx: CpiContext<'_, '_, '_, 'info, SettleFundsCpi<'info>>,
+    is_spot: bool
 ) -> Result<()> {
     let ix = settle_funds_ix(
         ctx.accounts.cypher_group.key,
         ctx.accounts.vault_signer.key,
         ctx.accounts.cypher_user.key,
         ctx.accounts.user_signer.key,
-        ctx.accounts.c_asset_mint.key,
-        ctx.accounts.cypher_c_asset_vault.key,
+        ctx.accounts.asset_mint.key,
+        ctx.accounts.cypher_asset_vault.key,
         ctx.accounts.cypher_pc_vault.key,
         ctx.accounts.NoOpSettleFundsdex.market.key,
         ctx.accounts.NoOpSettleFundsdex.open_orders.key,
         ctx.accounts.NoOpSettleFundsdex.coin_vault.key,
         ctx.accounts.NoOpSettleFundsdex.pc_vault.key,
         ctx.accounts.NoOpSettleFundsdex.vault_signer.key,
+        is_spot
     );
     invoke_signed(
         &ix,

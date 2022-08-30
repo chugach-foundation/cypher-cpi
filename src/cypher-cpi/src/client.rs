@@ -113,6 +113,7 @@ pub fn init_pyth_products_ix(
     cypher_group: &Pubkey,
     admin: &Pubkey,
     pyth_products: &Pubkey,
+    total_num_products: u8,
     weights: Vec<u16>
 ) -> Instruction {
     let accounts = InitPythProducts {
@@ -121,6 +122,7 @@ pub fn init_pyth_products_ix(
         pyth_products: *pyth_products
     };
     let ix_data = crate::instruction::InitPythProducts {
+        _total_num_products: total_num_products,
         _weights: weights
     };
     Instruction {
@@ -278,7 +280,7 @@ pub fn deposit_collateral_ix(
         cypher_user: *cypher_user,
         user_signer: *owner,
         spot_mint: *spot_mint,
-        cypher_vault: *cypher_vault,
+        cypher_asset_vault: *cypher_vault,
         deposit_from: *source_token_account,
         token_program: token::ID,
     };
@@ -307,9 +309,9 @@ pub fn withdraw_collateral_ix(
         cypher_group: *cypher_group,
         cypher_user: *cypher_user,
         user_signer: *owner,
-        spot_mint: *spot_mint,
+        asset_mint: *spot_mint,
         vault_signer: *vault_signer,
-        cypher_vault: *cypher_vault,
+        cypher_asset_vault: *cypher_vault,
         withdraw_to: *destination_token_account,
         token_program: token::ID,
     };
@@ -413,6 +415,7 @@ pub fn init_open_orders_ix(
     dex_market: &Pubkey,
     open_orders: &Pubkey,
     market_authority: &Pubkey,
+    is_spot: bool
 ) -> Instruction {
     let accounts = InitOpenOrders {
         cypher_group: *cypher_group,
@@ -426,10 +429,15 @@ pub fn init_open_orders_ix(
         system_program: system_program::ID,
         dex_program: dex::id(),
     };
-
+    let mut is_spot_byte = [1_u8].to_vec();
+    if is_spot {
+        is_spot_byte[0] = 0_u8;
+    }
+    let mut ix_data = MarketInstruction::InitOpenOrders.pack();
+    ix_data.append(&mut is_spot_byte);
     Instruction {
         accounts: accounts.to_account_metas(Some(false)),
-        data: MarketInstruction::InitOpenOrders.pack(),
+        data: ix_data,
         program_id: crate::id(),
     }
 }
@@ -440,6 +448,7 @@ pub fn close_open_orders_ix(
     user_signer: &Pubkey,
     dex_market: &Pubkey,
     open_orders: &Pubkey,
+    is_spot: bool
 ) -> Instruction {
     let accounts = CloseOpenOrders {
         cypher_group: *cypher_group,
@@ -449,10 +458,15 @@ pub fn close_open_orders_ix(
         open_orders: *open_orders,
         dex_program: dex::id(),
     };
-
+    let mut is_spot_byte = [1_u8].to_vec();
+    if is_spot {
+        is_spot_byte[0] = 0_u8;
+    }
+    let mut ix_data = MarketInstruction::CloseOpenOrders.pack();
+    ix_data.append(&mut is_spot_byte);
     Instruction {
         accounts: accounts.to_account_metas(Some(false)),
-        data: MarketInstruction::CloseOpenOrders.pack(),
+        data: ix_data,
         program_id: crate::id(),
     }
 }
@@ -464,8 +478,8 @@ pub fn new_order_v3_ix(
     price_history: &Pubkey,
     cypher_user: &Pubkey,
     user_signer: &Pubkey,
-    c_asset_mint: &Pubkey,
-    cypher_c_asset_vault: &Pubkey,
+    asset_mint: &Pubkey,
+    cypher_asset_vault: &Pubkey,
     cypher_pc_vault: &Pubkey,
     dex_market: &Pubkey,
     open_orders: &Pubkey,
@@ -477,6 +491,7 @@ pub fn new_order_v3_ix(
     pc_vault: &Pubkey,
     dex_vault_signer: &Pubkey,
     data: NewOrderInstructionV3,
+    is_spot: bool,
 ) -> Instruction {
     let accounts = NewOrderV3 {
         cypher_group: *cypher_group,
@@ -484,8 +499,8 @@ pub fn new_order_v3_ix(
         price_history: *price_history,
         cypher_user: *cypher_user,
         user_signer: *user_signer,
-        c_asset_mint: *c_asset_mint,
-        cypher_c_asset_vault: *cypher_c_asset_vault,
+        asset_mint: *asset_mint,
+        cypher_asset_vault: *cypher_asset_vault,
         cypher_pc_vault: *cypher_pc_vault,
         NoOpNewOrderV3dex: NewOrderV3Dex {
             market: *dex_market,
@@ -502,11 +517,16 @@ pub fn new_order_v3_ix(
             dex_program: dex::id(),
         },
     };
-
+    let mut is_spot_byte = [1_u8].to_vec();
+    if is_spot {
+        is_spot_byte[0] = 0_u8;
+    }
+    let mut ix_data = MarketInstruction::NewOrderV3(data).pack();
+    ix_data.append(&mut is_spot_byte);
     Instruction {
         program_id: crate::id(),
         accounts: accounts.to_account_metas(Some(false)),
-        data: MarketInstruction::NewOrderV3(data).pack(),
+        data: ix_data
     }
 }
 
@@ -516,8 +536,8 @@ pub fn cancel_order_v2_ix(
     vault_signer: &Pubkey,
     cypher_user: &Pubkey,
     user_signer: &Pubkey,
-    c_asset_mint: &Pubkey,
-    cypher_c_asset_vault: &Pubkey,
+    asset_mint: &Pubkey,
+    cypher_asset_vault: &Pubkey,
     cypher_pc_vault: &Pubkey,
     dex_market: &Pubkey,
     prune_authority: &Pubkey,
@@ -529,14 +549,15 @@ pub fn cancel_order_v2_ix(
     pc_vault: &Pubkey,
     dex_vault_signer: &Pubkey,
     data: CancelOrderInstructionV2,
+    is_spot: bool,
 ) -> Instruction {
     let accounts = CancelOrder {
         cypher_group: *cypher_group,
         vault_signer: *vault_signer,
         cypher_user: *cypher_user,
         user_signer: *user_signer,
-        c_asset_mint: *c_asset_mint,
-        cypher_c_asset_vault: *cypher_c_asset_vault,
+        asset_mint: *asset_mint,
+        cypher_asset_vault: *cypher_asset_vault,
         cypher_pc_vault: *cypher_pc_vault,
         NoOpCancelOrderdex: CancelOrderDex {
             market: *dex_market,
@@ -552,11 +573,16 @@ pub fn cancel_order_v2_ix(
             dex_program: dex::id(),
         },
     };
-
+    let mut is_spot_byte = [1_u8].to_vec();
+    if is_spot {
+        is_spot_byte[0] = 0_u8;
+    }
+    let mut ix_data = MarketInstruction::CancelOrderV2(data).pack();
+    ix_data.append(&mut is_spot_byte);
     Instruction {
         program_id: crate::id(),
         accounts: accounts.to_account_metas(Some(false)),
-        data: MarketInstruction::CancelOrderV2(data).pack(),
+        data: ix_data,
     }
 }
 
@@ -566,8 +592,8 @@ pub fn cancel_order_by_client_id_v2_ix(
     vault_signer: &Pubkey,
     cypher_user: &Pubkey,
     user_signer: &Pubkey,
-    c_asset_mint: &Pubkey,
-    cypher_c_asset_vault: &Pubkey,
+    asset_mint: &Pubkey,
+    cypher_asset_vault: &Pubkey,
     cypher_pc_vault: &Pubkey,
     dex_market: &Pubkey,
     prune_authority: &Pubkey,
@@ -579,14 +605,15 @@ pub fn cancel_order_by_client_id_v2_ix(
     pc_vault: &Pubkey,
     dex_vault_signer: &Pubkey,
     client_id: u64,
+    is_spot: bool
 ) -> Instruction {
     let accounts = CancelOrder {
         cypher_group: *cypher_group,
         vault_signer: *vault_signer,
         cypher_user: *cypher_user,
         user_signer: *user_signer,
-        c_asset_mint: *c_asset_mint,
-        cypher_c_asset_vault: *cypher_c_asset_vault,
+        asset_mint: *asset_mint,
+        cypher_asset_vault: *cypher_asset_vault,
         cypher_pc_vault: *cypher_pc_vault,
         NoOpCancelOrderdex: CancelOrderDex {
             market: *dex_market,
@@ -602,11 +629,16 @@ pub fn cancel_order_by_client_id_v2_ix(
             dex_program: dex::id(),
         },
     };
-
+    let mut is_spot_byte = [1_u8].to_vec();
+    if is_spot {
+        is_spot_byte[0] = 0_u8;
+    }
+    let mut ix_data = MarketInstruction::CancelOrderByClientIdV2(client_id).pack();
+    ix_data.append(&mut is_spot_byte);
     Instruction {
         program_id: crate::id(),
         accounts: accounts.to_account_metas(Some(false)),
-        data: MarketInstruction::CancelOrderByClientIdV2(client_id).pack(),
+        data: ix_data
     }
 }
 
@@ -616,22 +648,23 @@ pub fn settle_funds_ix(
     vault_signer: &Pubkey,
     cypher_user: &Pubkey,
     user_signer: &Pubkey,
-    c_asset_mint: &Pubkey,
-    cypher_c_asset_vault: &Pubkey,
+    asset_mint: &Pubkey,
+    cypher_asset_vault: &Pubkey,
     cypher_pc_vault: &Pubkey,
     dex_market: &Pubkey,
     open_orders: &Pubkey,
     coin_vault: &Pubkey,
     pc_vault: &Pubkey,
     dex_vault_signer: &Pubkey,
+    is_spot: bool
 ) -> Instruction {
     let accounts = SettleFunds {
         cypher_group: *cypher_group,
         vault_signer: *vault_signer,
         cypher_user: *cypher_user,
         user_signer: *user_signer,
-        c_asset_mint: *c_asset_mint,
-        cypher_c_asset_vault: *cypher_c_asset_vault,
+        asset_mint: *asset_mint,
+        cypher_asset_vault: *cypher_asset_vault,
         cypher_pc_vault: *cypher_pc_vault,
         NoOpSettleFundsdex: SettleFundsDex {
             market: *dex_market,
@@ -643,11 +676,16 @@ pub fn settle_funds_ix(
             dex_program: dex::id(),
         },
     };
-
+    let mut is_spot_byte = [1_u8].to_vec();
+    if is_spot {
+        is_spot_byte[0] = 0_u8;
+    }
+    let mut ix_data = MarketInstruction::SettleFunds.pack();
+    ix_data.append(&mut is_spot_byte);
     Instruction {
         program_id: crate::id(),
         accounts: accounts.to_account_metas(Some(false)),
-        data: MarketInstruction::SettleFunds.pack(),
+        data: ix_data,
     }
 }
 
