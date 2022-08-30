@@ -783,7 +783,6 @@ dependencies = [
  "arrayref",
  "bytemuck",
  "fixed",
- "jet-proto-math",
  "num_enum",
  "serum_dex 0.5.6 (git+https://github.com/chugach-foundation/serum-dex.git?rev=0353fbb)",
  "static_assertions",
@@ -1066,17 +1065,6 @@ name = "itoa"
 version = "1.0.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6c8af84674fe1f223a982c933a0ee1086ac4d4052aa0fb8060c12c6ad838e754"
-
-[[package]]
-name = "jet-proto-math"
-version = "1.0.6"
-source = "git+https://github.com/chugach-foundation/jet-program-libraries.git?rev=ac8909b#ac8909b15f1716e9de3bcb246656611b62c0378a"
-dependencies = [
- "bytemuck",
- "static_assertions",
- "thiserror",
- "uint",
-]
 
 [[package]]
 name = "js-sys"
@@ -1454,12 +1442,6 @@ name = "regex-syntax"
 version = "0.6.27"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a3f87b73ce11b1619a3c6332f45341e0047173771e8b8b73f87bfeefb7b56244"
-
-[[package]]
-name = "rustc-hex"
-version = "2.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3e75f6a532d0fd9f7f13144f392b6ad56a32696bfcd9c78f797f16bbb6f072d6"
 
 [[package]]
 name = "rustc_version"
@@ -1848,18 +1830,6 @@ name = "ucd-trie"
 version = "0.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "89570599c4fe5585de2b388aab47e99f7fa4e9238a1399f707a02e356058141c"
-
-[[package]]
-name = "uint"
-version = "0.8.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9db035e67dfaf7edd9aebfe8676afcd63eed53c8a4044fed514c8cccf1835177"
-dependencies = [
- "byteorder",
- "crunchy",
- "rustc-hex",
- "static_assertions",
-]
 
 [[package]]
 name = "unicode-ident"
