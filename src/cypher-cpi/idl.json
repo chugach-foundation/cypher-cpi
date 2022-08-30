@@ -1950,11 +1950,11 @@
             "type": "u16"
           },
           {
-            "name": "padding",
+            "name": "padding1",
             "type": {
               "array": [
-                "u8",
-                6
+                "u16",
+                3
               ]
             }
           },
@@ -1977,7 +1977,16 @@
             "type": {
               "array": [
                 "u8",
-                14
+                6
+              ]
+            }
+          },
+          {
+            "name": "padding3",
+            "type": {
+              "array": [
+                "u64",
+                1
               ]
             }
           }
@@ -2055,6 +2064,13 @@
         "kind": "struct",
         "fields": [
           {
+            "name": "tokenMint",
+            "docs": [
+              "the token mint of the token being used for rewards"
+            ],
+            "type": "publicKey"
+          },
+          {
             "name": "rate",
             "docs": [
               "the rate that is used to convert liquidity points to the LM reward token"
@@ -2097,13 +2113,6 @@
             "type": "u64"
           },
           {
-            "name": "tokenMint",
-            "docs": [
-              "the token mint of the token being used for rewards"
-            ],
-            "type": "publicKey"
-          },
-          {
             "name": "minRateAdj",
             "docs": [
               "the minimum rate adjustment"
@@ -2132,7 +2141,7 @@
             "type": "u8"
           },
           {
-            "name": "padding",
+            "name": "padding1",
             "type": {
               "array": [
                 "u8",
@@ -2167,11 +2176,42 @@
             }
           },
           {
-            "name": "padding",
+            "name": "marketType",
+            "type": {
+              "defined": "MarketType"
+            }
+          },
+          {
+            "name": "deliveryType",
+            "docs": [
+              "the delivery type of the market upon execution and settlement"
+            ],
+            "type": {
+              "defined": "DeliveryType"
+            }
+          },
+          {
+            "name": "isExecuted",
+            "docs": [
+              "whether this market has been executed"
+            ],
+            "type": "bool"
+          },
+          {
+            "name": "isActive",
+            "docs": [
+              "whether the market is active",
+              "i.e a physical delivery market should only be activated after equivalent amount of spot tokens",
+              "have been deposited to the spot vault"
+            ],
+            "type": "bool"
+          },
+          {
+            "name": "padding1",
             "type": {
               "array": [
                 "u8",
-                7
+                3
               ]
             }
           },
@@ -2218,45 +2258,26 @@
             "type": "u64"
           },
           {
-            "name": "marketType",
+            "name": "padding2",
             "docs": [
               "the market market type"
             ],
             "type": {
-              "defined": "MarketType"
-            }
-          },
-          {
-            "name": "deliveryType",
-            "docs": [
-              "the delivery type of the market upon execution and settlement"
-            ],
-            "type": {
-              "defined": "DeliveryType"
-            }
-          },
-          {
-            "name": "isExecuted",
-            "docs": [
-              "whether this market has been executed"
-            ],
-            "type": "bool"
-          },
-          {
-            "name": "isActive",
-            "docs": [
-              "whether the market is active",
-              "i.e a physical delivery market should only be activated after equivalent amount of spot tokens",
-              "have been deposited to the spot vault"
-            ],
-            "type": "bool"
-          },
-          {
-            "name": "padding2",
-            "type": {
               "array": [
                 "u8",
-                20
+                8
+              ]
+            }
+          },
+          {
+            "name": "padding3",
+            "docs": [
+              "the market market type"
+            ],
+            "type": {
+              "array": [
+                "u64",
+                2
               ]
             }
           }
@@ -2322,6 +2343,20 @@
             "name": "cAssetVault",
             "docs": [
               "cypher token vault address."
+            ],
+            "type": "publicKey"
+          },
+          {
+            "name": "spotMint",
+            "docs": [
+              "spot market token mint address."
+            ],
+            "type": "publicKey"
+          },
+          {
+            "name": "spotVault",
+            "docs": [
+              "spot token vault address"
             ],
             "type": "publicKey"
           },
@@ -2412,20 +2447,6 @@
                 2
               ]
             }
-          },
-          {
-            "name": "spotMint",
-            "docs": [
-              "spot market token mint address."
-            ],
-            "type": "publicKey"
-          },
-          {
-            "name": "spotVault",
-            "docs": [
-              "spot token vault address"
-            ],
-            "type": "publicKey"
           },
           {
             "name": "indexUpdatedAt",
