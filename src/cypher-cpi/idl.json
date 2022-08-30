@@ -1950,6 +1950,15 @@
             "type": "u16"
           },
           {
+            "name": "padding",
+            "type": {
+              "array": [
+                "u8",
+                6
+              ]
+            }
+          },
+          {
             "name": "feePercentageForProtocol",
             "docs": [
               "fee for protocol"
@@ -1964,11 +1973,11 @@
             "type": "u8"
           },
           {
-            "name": "padding",
+            "name": "padding2",
             "type": {
               "array": [
                 "u8",
-                20
+                14
               ]
             }
           }
@@ -2455,6 +2464,15 @@
             "type": "u16"
           },
           {
+            "name": "padding",
+            "type": {
+              "array": [
+                "u8",
+                2
+              ]
+            }
+          },
+          {
             "name": "decimals",
             "docs": [
               "spl token decimals of the futures token mint"
@@ -2469,11 +2487,11 @@
             "type": "u8"
           },
           {
-            "name": "padding",
+            "name": "padding2",
             "type": {
               "array": [
                 "u8",
-                8
+                6
               ]
             }
           }
