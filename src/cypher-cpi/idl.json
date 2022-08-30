@@ -2155,6 +2155,27 @@
         "kind": "struct",
         "fields": [
           {
+            "name": "dexMarketAuthorityBumpSeed",
+            "docs": [
+              "bump seed value used to generate market_authority pda"
+            ],
+            "type": {
+              "array": [
+                "u8",
+                1
+              ]
+            }
+          },
+          {
+            "name": "padding",
+            "type": {
+              "array": [
+                "u8",
+                7
+              ]
+            }
+          },
+          {
             "name": "dexMarket",
             "docs": [
               "serum futures market address."
@@ -2222,18 +2243,6 @@
             "type": "bool"
           },
           {
-            "name": "dexMarketAuthorityBumpSeed",
-            "docs": [
-              "bump seed value used to generate market_authority pda"
-            ],
-            "type": {
-              "array": [
-                "u8",
-                1
-              ]
-            }
-          },
-          {
             "name": "isActive",
             "docs": [
               "whether the market is active",
@@ -2243,11 +2252,11 @@
             "type": "bool"
           },
           {
-            "name": "padding",
+            "name": "padding2",
             "type": {
               "array": [
                 "u8",
-                27
+                20
               ]
             }
           }
