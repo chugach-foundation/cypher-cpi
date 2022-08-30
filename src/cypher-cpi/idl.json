@@ -265,7 +265,7 @@
         {
           "name": "args",
           "type": {
-            "defined": "LiquidityMiningInfo"
+            "defined": "LiquidityMiningArgs"
           }
         }
       ]
@@ -1637,6 +1637,91 @@
   ],
   "types": [
     {
+      "name": "LiquidityMiningArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "rate",
+            "docs": [
+              "the rate that is used to convert liquidity points to the LM reward token"
+            ],
+            "type": "i128"
+          },
+          {
+            "name": "maxDepthBps",
+            "docs": [
+              "max depth on the book in bps"
+            ],
+            "type": "i128"
+          },
+          {
+            "name": "periodStart",
+            "docs": [
+              "timestamp of the start of the liquidity mining incentive period"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "targetPeriodLength",
+            "docs": [
+              "target time length for a liquidity mining period"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "tokensLeft",
+            "docs": [
+              "tokens left for this period."
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "tokensPerPeriod",
+            "docs": [
+              "total amount of tokens allocated for a given period"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "tokenMint",
+            "docs": [
+              "the token mint of the token being used for rewards"
+            ],
+            "type": "publicKey"
+          },
+          {
+            "name": "minRateAdj",
+            "docs": [
+              "the minimum rate adjustment"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "maxRateAdj",
+            "docs": [
+              "the maximum rate adjusment"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "sizeCutoff",
+            "docs": [
+              "the size cut off for rewards"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "tokenDecimals",
+            "docs": [
+              "the decimals of the token being rewarded"
+            ],
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
       "name": "InitCypherGroupArgs",
       "type": {
         "kind": "struct",
@@ -2016,10 +2101,16 @@
           },
           {
             "name": "sizeCutoff",
+            "docs": [
+              "the size cut off for rewards"
+            ],
             "type": "u64"
           },
           {
             "name": "tokenDecimals",
+            "docs": [
+              "the decimals of the token being rewarded"
+            ],
             "type": "u8"
           },
           {

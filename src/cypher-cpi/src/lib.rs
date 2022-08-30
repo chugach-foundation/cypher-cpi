@@ -20,12 +20,14 @@ anchor_gen::generate_cpi_interface!(
         CypherToken,
         DerivativesMarketInfo,
         SpotMarketInfo,
+        LiquidityMiningInfo,
         OraclePrice,
         CypherUser,
         UserPosition,
         OpenOrdersInfo,
         PriceHistory
-    )
+    ),
+    
 );
 
 #[cfg(feature = "mainnet-beta")]
