@@ -1,15 +1,20 @@
 #![allow(dead_code)]
+
 use {
     crate::accounts::{
-        CloseCypherUser, CreateCypherUser, DepositCollateral, InitCypherUser, LiquidateCollateral,
-        NoOpCancelOrder as CancelOrder, NoOpCancelOrderDex as CancelOrderDex,
-        NoOpCloseOpenOrders as CloseOpenOrders, NoOpInitOpenOrders as InitOpenOrders,
-        NoOpNewOrderV3 as NewOrderV3, NoOpNewOrderV3Dex as NewOrderV3Dex,
-        NoOpSettleFunds as SettleFunds, NoOpSettleFundsDex as SettleFundsDex, SetDelegate,
-        SettlePosition, WithdrawCollateral,
+        CloseCypherUser, CloseMarket, CreateCypherUser, DepositCollateral, ExecuteMarket,
+        InitCypherUser, LiquidateCollateral, NoOpCancelOrder as CancelOrder,
+        NoOpCancelOrderDex as CancelOrderDex, NoOpCloseOpenOrders as CloseOpenOrders,
+        NoOpInitOpenOrders as InitOpenOrders, NoOpNewOrderV3 as NewOrderV3,
+        NoOpNewOrderV3Dex as NewOrderV3Dex, NoOpSettleFunds as SettleFunds,
+        NoOpSettleFundsDex as SettleFundsDex, SetDelegate, SettlePosition, WithdrawCollateral,
     },
     anchor_discriminator::get_ix_data,
-    anchor_lang::{prelude::*, system_program, solana_program::{sysvar::SysvarId, instruction::Instruction}},
+    anchor_lang::{
+        prelude::*,
+        solana_program::{instruction::Instruction, sysvar::SysvarId},
+        system_program,
+    },
     anchor_spl::{dex, token, token::spl_token},
     bytemuck::bytes_of,
     serum_dex::instruction::{CancelOrderInstructionV2, MarketInstruction, NewOrderInstructionV3},
@@ -22,6 +27,65 @@ pub trait ToPubkey {
 impl ToPubkey for [u64; 4] {
     fn to_pubkey(&self) -> Pubkey {
         Pubkey::new(bytes_of(self))
+    }
+}
+
+pub fn execute_market_ix(
+    cypher_group: &Pubkey,
+    admin: &Pubkey,
+    c_asset_mint: &Pubkey,
+    dex_market: &Pubkey,
+    event_queue: &Pubkey,
+) -> Instruction {
+    let accounts = ExecuteMarket {
+        cypher_group: *cypher_group,
+        admin: *admin,
+        dex_market: *dex_market,
+        event_q: *event_queue,
+    };
+    let ix_data = crate::instruction::ExecuteMarket {
+        _c_asset_mint: *c_asset_mint,
+    };
+    Instruction {
+        accounts: accounts.to_account_metas(Some(false)),
+        data: get_ix_data(
+            "execute_market",
+            AnchorSerialize::try_to_vec(&ix_data).unwrap(),
+        ),
+        program_id: crate::id(),
+    }
+}
+
+pub fn close_market_ix(
+    cypher_group: &Pubkey,
+    admin: &Pubkey,
+    vault_signer: &Pubkey,
+    c_asset_mint: &Pubkey,
+    cypher_c_asset_vault: &Pubkey,
+    cypher_pc_vault: &Pubkey,
+    price_history: &Pubkey,
+    pyth_products: &Pubkey,
+) -> Instruction {
+    let accounts = CloseMarket {
+        cypher_group: *cypher_group,
+        admin: *admin,
+        fee_receiver: *admin,
+        vault_signer: *vault_signer,
+        c_asset_mint: *c_asset_mint,
+        cypher_c_asset_vault: *cypher_c_asset_vault,
+        cypher_pc_vault: *cypher_pc_vault,
+        pyth_products: *pyth_products,
+        price_history: *price_history,
+        token_program: token::ID,
+    };
+    let ix_data = crate::instruction::CloseMarket {};
+    Instruction {
+        accounts: accounts.to_account_metas(Some(false)),
+        data: get_ix_data(
+            "close_market",
+            AnchorSerialize::try_to_vec(&ix_data).unwrap(),
+        ),
+        program_id: crate::id(),
     }
 }
 
