@@ -346,6 +346,56 @@ pub fn close_open_orders_ix(
 }
 
 #[allow(clippy::too_many_arguments)]
+pub fn prune_ix(
+    cypher_group: &Pubkey,
+    vault_signer: &Pubkey,
+    cypher_user: &Pubkey,
+    user_signer: &Pubkey,
+    c_asset_mint: &Pubkey,
+    cypher_c_asset_vault: &Pubkey,
+    cypher_pc_vault: &Pubkey,
+    dex_market: &Pubkey,
+    prune_authority: &Pubkey,
+    open_orders: &Pubkey,
+    event_queue: &Pubkey,
+    bids: &Pubkey,
+    asks: &Pubkey,
+    coin_vault: &Pubkey,
+    pc_vault: &Pubkey,
+    dex_vault_signer: &Pubkey,
+    limit: u16,
+) -> Instruction {
+    let accounts = CancelOrder {
+        cypher_group: *cypher_group,
+        vault_signer: *vault_signer,
+        cypher_user: *cypher_user,
+        user_signer: *user_signer,
+        c_asset_mint: *c_asset_mint,
+        cypher_c_asset_vault: *cypher_c_asset_vault,
+        cypher_pc_vault: *cypher_pc_vault,
+        NoOpCancelOrderdex: CancelOrderDex {
+            market: *dex_market,
+            prune_authority: *prune_authority,
+            open_orders: *open_orders,
+            event_q: *event_queue,
+            bids: *bids,
+            asks: *asks,
+            coin_vault: *coin_vault,
+            pc_vault: *pc_vault,
+            vault_signer: *dex_vault_signer,
+            token_program: spl_token::id(),
+            dex_program: dex::id(),
+        },
+    };
+
+    Instruction {
+        program_id: crate::id(),
+        accounts: accounts.to_account_metas(Some(false)),
+        data: MarketInstruction::Prune(limit).pack(),
+    }
+}
+
+#[allow(clippy::too_many_arguments)]
 pub fn new_order_v3_ix(
     cypher_group: &Pubkey,
     vault_signer: &Pubkey,
